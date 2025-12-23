@@ -2,6 +2,7 @@ package br.com.mali_social.social_meli.controller;
 
 
 import br.com.mali_social.social_meli.dto.ListaUsuariosSeguindoresDto;
+import br.com.mali_social.social_meli.dto.QuatidadeSeguidoresDto;
 import br.com.mali_social.social_meli.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +24,9 @@ public class UsuarioController {
     }
 
     @GetMapping("/{userId}/followers/count")
-    public String ContaSeguidores (@PathVariable long userId){
+    public QuatidadeSeguidoresDto ContaSeguidores (@PathVariable long userId){
         System.out.println("contagem de usuarios :"+userId);
-        long qtdSeguidores = usuarioService.contaSeguidores(userId);
-        return String.valueOf(qtdSeguidores);
+        return usuarioService.contaSeguidores(userId);
     }
 
     @GetMapping("/{userId}/followers/list")

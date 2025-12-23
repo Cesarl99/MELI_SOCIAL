@@ -1,6 +1,7 @@
 package br.com.mali_social.social_meli.service;
 
 import br.com.mali_social.social_meli.dto.ListaUsuariosSeguindoresDto;
+import br.com.mali_social.social_meli.dto.QuatidadeSeguidoresDto;
 import br.com.mali_social.social_meli.dto.UsuarioDto;
 import br.com.mali_social.social_meli.entity.SeguidoresEntity;
 import br.com.mali_social.social_meli.entity.UsuarioEntity;
@@ -19,44 +20,49 @@ public class UsuarioService {
         this.seguidoresRepository = seguidoresRepository;
         this.usuarioRepository = usuarioRepository;
     }
-    public long contarSeguidoresDoVendedor(long vendedorId) {
+    public int contarSeguidoresDoVendedor(long vendedorId) {
         return seguidoresRepository.countByVendedorId(vendedorId);
     }
 
     public String seguir(long UserId, long userIdToFollow){
-        System.out.println("USUARIO PARA SERGUIR ");
-        System.out.println("CHAMANDO O REPOSITRY");
         SeguidoresEntity seguidores = new SeguidoresEntity();
         seguidores.setVendedor_id(userIdToFollow);
         seguidores.setComprador_id(UserId);
         return seguidoresRepository.save(seguidores).toString();
     }
 
-    public long contaSeguidores(long UserId){
-        long numeros_seguidores = contarSeguidoresDoVendedor(UserId);
-        System.out.println("USUARIO COM O ID " + UserId + "possue " + numeros_seguidores);
-        return numeros_seguidores;
+    public QuatidadeSeguidoresDto contaSeguidores(long UserId){
+        int  numeros_seguidores = contarSeguidoresDoVendedor(UserId);
+        UsuarioEntity vendedor = usuarioRepository.findById(UserId).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+
+        return mapQtdSeguidoresparaDTO(numeros_seguidores, vendedor);
     }
 
     public ListaUsuariosSeguindoresDto listaSeguidores(long UserId){
         UsuarioEntity vendedor = usuarioRepository.findById(UserId).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
         List<SeguidoresEntity> relacao = seguidoresRepository.findByVendedorId(UserId);
-        System.out.println("valor de relacao" + relacao.toString());
         List<UsuarioDto> seguidores = relacao.stream()
                 .map(this::mapRelacaoParaFollowerDTO)
                 .toList();
-        System.out.println("valor do seguidores" + seguidores.toString());
         return mapVendedorEFollowersParaDTO(vendedor, seguidores);
     }
 
 
+    private QuatidadeSeguidoresDto mapQtdSeguidoresparaDTO(int numeroSeguidores, UsuarioEntity vendedor){
+        return new QuatidadeSeguidoresDto(
+            vendedor.getId(),
+            vendedor.getNome(),
+            numeroSeguidores
+        );
+
+    }
+
+
     private UsuarioDto mapRelacaoParaFollowerDTO(SeguidoresEntity relacao) {
-        System.out.println("dentro do maprelacao" + relacao.toString());
+
         UsuarioEntity usuario = usuarioRepository.findById(relacao.getComprador_id())
                 .orElseThrow(() ->
                         new RuntimeException("Seguidor não encontrado: " + relacao.getComprador_id()));
-
-        System.out.println("valor do usuarios" + usuario.getId() + usuario.getNome());
 
         return new UsuarioDto(
                 usuario.getId(),
@@ -71,5 +77,7 @@ public class UsuarioService {
                 compradores
         );
     }
+
+
 
 }
