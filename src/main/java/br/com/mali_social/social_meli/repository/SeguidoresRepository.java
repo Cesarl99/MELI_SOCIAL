@@ -11,5 +11,6 @@ import java.util.List;
 public interface SeguidoresRepository extends JpaRepository<SeguidoresEntity, Long> {
     int countByVendedorId(long vendedorId);
     List<SeguidoresEntity> findByVendedorId(long vendedorId);
+    List<SeguidoresEntity> findByCompradorId(long compradorId);
 
 }
