@@ -27,11 +27,11 @@ public class SeguidoresEntity {
         return id;
     }
 
-    public void setId(long id) {    // tipo long pra bater com o campo
+    public void setId(long id) {
         this.id = id;
     }
 
-    public long getComprador_id() { // nome igual ao campo
+    public long getComprador_id() {
         return compradorId;
     }
 
