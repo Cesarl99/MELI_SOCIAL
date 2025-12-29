@@ -9,6 +9,15 @@ public class ProdutoDto {
     private String color;
     private String notes;
 
+    public ProdutoDto(String notes, String color, String brand, String type, String product_name, Long product_id) {
+        this.notes = notes;
+        this.color = color;
+        this.brand = brand;
+        this.type = type;
+        this.product_name = product_name;
+        this.product_id = product_id;
+    }
+
     public Long getProduct_id() {
         return product_id;
     }
@@ -56,4 +65,17 @@ public class ProdutoDto {
     public void setProduct_name(String product_name) {
         this.product_name = product_name;
     }
+
+    @Override
+    public String toString() {
+        return "ProdutoDto{" +
+                "product_id=" + product_id +
+                ", product_name='" + product_name + '\'' +
+                ", type='" + type + '\'' +
+                ", brand='" + brand + '\'' +
+                ", color='" + color + '\'' +
+                ", notes='" + notes + '\'' +
+                '}';
+    }
+
 }

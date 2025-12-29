@@ -84,4 +84,16 @@ public class ProdutosEntity {
     public void setCor(String cor) {
         this.cor = cor;
     }
+
+    @Override
+    public String toString() {
+        return "ProdutosEntity{" +
+                "Id=" + Id +
+                ", nome_produto='" + nome_produto + '\'' +
+                ", tipo='" + tipo + '\'' +
+                ", marca='" + marca + '\'' +
+                ", cor='" + cor + '\'' +
+                ", notas='" + notas + '\'' +
+                '}';
+    }
 }

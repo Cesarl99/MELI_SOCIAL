@@ -47,6 +47,22 @@ public class PublicacaoEntity {
         this.data = data;
     }
 
+    public UsuarioEntity getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(UsuarioEntity usuario) {
+        this.usuario = usuario;
+    }
+
+    public ProdutosEntity getProduto() {
+        return produto;
+    }
+
+    public void setProduto(ProdutosEntity produto) {
+        this.produto = produto;
+    }
+
     public long getId() {
         return Id;
     }
@@ -54,7 +70,6 @@ public class PublicacaoEntity {
     public void setId(long id) {
         Id = id;
     }
-
 
     public double getDesconto() {
         return desconto;
@@ -94,5 +109,21 @@ public class PublicacaoEntity {
 
     public void setData(LocalDate data) {
         this.data = data;
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "PublicacaoEntity{" +
+                "Id=" + Id +
+                ", data=" + data +
+                ", categoria=" + categoria +
+                ", preco=" + preco +
+                ", promocao=" + promocao +
+                ", desconto=" + desconto +
+                ", usuario=" + usuario +
+                ", produto=" + produto +
+                '}';
     }
 }

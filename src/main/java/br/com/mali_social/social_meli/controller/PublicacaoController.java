@@ -1,6 +1,9 @@
 package br.com.mali_social.social_meli.controller;
 
+import br.com.mali_social.social_meli.dto.ListaPublicacaoUsuariosDto;
 import br.com.mali_social.social_meli.dto.PublicacaoDto;
+import br.com.mali_social.social_meli.entity.ProdutosEntity;
+import br.com.mali_social.social_meli.service.ProdutoService;
 import br.com.mali_social.social_meli.service.PublicacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,34 +15,23 @@ public class PublicacaoController {
 
     @Autowired
     private PublicacaoService publicacaoService;
+    @Autowired
+    private ProdutoService produtoService;
     @PostMapping("/publish")
     public String criarPublicacao(@RequestBody PublicacaoDto publicacaoDto){
-        System.out.println("categoria: " + publicacaoDto.getCategory() + " data: "+ publicacaoDto.getDate());
-        System.out.println("preço" + publicacaoDto.getPrice() + " user_id" + publicacaoDto.getUser_id());
-        System.out.println("produto_id " + publicacaoDto.getProduct().getProduct_id());
-        System.out.println("produto nome " + publicacaoDto.getProduct().getProduct_name());
-        System.out.println("produto tipo " + publicacaoDto.getProduct().getType());
-        System.out.println("produto marca " + publicacaoDto.getProduct().getBrand());
-        System.out.println("produto Cor " + publicacaoDto.getProduct().getColor());
-        System.out.println("produto Notas" + publicacaoDto.getProduct().getNotes());
-
-        return publicacaoService.salvarPublicacao(publicacaoDto);
+        // TODO ADICIONAR AS VERIFICAÇÕES
+        ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
+        return publicacaoService.salvarPublicacao(publicacaoDto, produto);
     }
-// TODO IMPLEMENTAR APÓS O BANCO DE DADOS
-//    @GetMapping("/followed/{userId}/list")
-//    public String listaPublicacaoUsuario(
-//            @PathVariable int userId,
-//            @RequestParam(name = "order", required = false, defaultValue = "date_asc") String order
-//            ){
-//        Sort sort = mapOrderToSort(order);
-//        return ("IMPLEMENTAR LISTA DAS PUBLICACOES");
-//    }
 
+    @GetMapping("/followed/{userId}/list")
+    public ListaPublicacaoUsuariosDto listaPublicacaoUsuario(@PathVariable Long userId){
+        return publicacaoService.ListaPublicacaoUsuario(userId);
+    }
 
     @PostMapping ("/promo-pub")
     public String criaPublicacaoDesconto(@PathVariable PublicacaoDto publicacaoDto){
-
-        return publicacaoService.salvarPublicacao(publicacaoDto);
+        return publicacaoService.salvarPublicacao(publicacaoDto, null);
     }
 
     @GetMapping ("/promo-pub/list")
