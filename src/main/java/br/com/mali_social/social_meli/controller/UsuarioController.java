@@ -39,9 +39,9 @@ public class UsuarioController {
         return usuarioService.listaSeguindo(userId);
     }
 
-    @GetMapping("/{userId}/unfollow/{userIdToUnfollow}")
+    @PostMapping("/{userId}/unfollow/{userIdToUnfollow}")
     public String deixarSeguir (@PathVariable int userId, @PathVariable int userIdToUnfollow){
-        return ("o usuario com o id "+ userId +" deixou de seguir o usuario com o id " + userIdToUnfollow);
+        return usuarioService.deixarDeSeguir(userId, userIdToUnfollow);
     }
 
 }

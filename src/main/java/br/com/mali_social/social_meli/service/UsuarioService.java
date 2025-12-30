@@ -58,6 +58,10 @@ public class UsuarioService {
         return mapCompradoresEVendedorParaDTO(comprador, seguidores);
     }
 
+    public String deixarDeSeguir(long compradorId, long vendedorId){
+        return seguidoresRepository.deleteByCompradorIdAndVendedorId(compradorId, vendedorId);
+    }
+
     private QuatidadeSeguidoresDto mapQtdSeguidoresparaDTO(int numeroSeguidores, UsuarioEntity vendedor){
         return new QuatidadeSeguidoresDto(
             vendedor.getId(),
