@@ -2,7 +2,6 @@ package br.com.mali_social.social_meli.service;
 
 import br.com.mali_social.social_meli.dto.ProdutoDto;
 import br.com.mali_social.social_meli.entity.ProdutosEntity;
-import br.com.mali_social.social_meli.entity.SeguidoresEntity;
 import br.com.mali_social.social_meli.repository.ProdutoRepository;
 import br.com.mali_social.social_meli.util.Verificacao;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ public class ProdutoService {
     }
 
     public ProdutosEntity salvarProduto(ProdutoDto produtoDto){
+
         ProdutosEntity produto = new ProdutosEntity();
 
         produto.setId(produtoDto.getProduct_id());

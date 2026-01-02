@@ -21,6 +21,11 @@ public class PublicacaoDto {
         this.discount = discount;
     }
 
+    public PublicacaoDto() {
+
+    }
+
+
     public Long getPost_id() {
         return post_id;
     }

@@ -20,7 +20,6 @@ public class UsuarioController {
 
     @PostMapping("/{userId}/follow/{userIdToFollow}")
     public String SeguirUsuario(@PathVariable long userId, @PathVariable long userIdToFollow){
-        System.out.println("o usuario do id " + userId + "está seguindo o usuario do id " + userIdToFollow);
         return usuarioService.seguir(userId, userIdToFollow);
     }
 
@@ -30,19 +29,23 @@ public class UsuarioController {
     }
 
     @GetMapping("/{userId}/followers/list")
-    public ListaUsuariosSeguindoresDto ListaSeguidores(@PathVariable int userId){
-        return usuarioService.listaSeguidores(userId);
+    public ListaUsuariosSeguindoresDto ListaSeguidores(@PathVariable int userId,
+                                                       @RequestParam(name = "order", required = false, defaultValue = "name_asc") String order){
+        return usuarioService.listaSeguidores(userId, order);
     }
 
     @GetMapping("/{userId}/followed/list")
-    public ListaUsuarioSeguindoDto ListaSeguindo (@PathVariable int userId){
-        return usuarioService.listaSeguindo(userId);
+    public ListaUsuarioSeguindoDto ListaSeguindo (@PathVariable int userId,
+                                                  @RequestParam(name = "order", required = false, defaultValue = "name_asc") String order){
+        return usuarioService.listaSeguindo(userId, order);
     }
 
     @PostMapping("/{userId}/unfollow/{userIdToUnfollow}")
-    public String deixarSeguir (@PathVariable int userId, @PathVariable int userIdToUnfollow){
+    public String DeixarSeguir (@PathVariable int userId, @PathVariable int userIdToUnfollow){
         return usuarioService.deixarDeSeguir(userId, userIdToUnfollow);
     }
+
+
 
 }
 

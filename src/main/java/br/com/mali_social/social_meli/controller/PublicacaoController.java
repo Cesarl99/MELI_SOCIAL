@@ -17,16 +17,17 @@ public class PublicacaoController {
     private PublicacaoService publicacaoService;
     @Autowired
     private ProdutoService produtoService;
+
     @PostMapping("/publish")
-    public String criarPublicacao(@RequestBody PublicacaoDto publicacaoDto){
-        // TODO ADICIONAR AS VERIFICAÇÕES
+    public void criarPublicacao(@RequestBody PublicacaoDto publicacaoDto){
         ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
-        return publicacaoService.salvarPublicacao(publicacaoDto, produto);
+        publicacaoService.salvarPublicacao(publicacaoDto, produto);
     }
 
     @GetMapping("/followed/{userId}/list")
-    public ListaPublicacaoUsuariosDto listaPublicacaoUsuario(@PathVariable Long userId){
-        return publicacaoService.ListaPublicacaoUsuario(userId);
+    public ListaPublicacaoUsuariosDto listaPublicacaoUsuario(@PathVariable Long userId,
+                                                             @RequestParam(name = "order", required = false, defaultValue = "date_asc") String order){
+        return publicacaoService.ListaPublicacaoUsuario(userId, order);
     }
 
     @PostMapping ("/promo-pub")

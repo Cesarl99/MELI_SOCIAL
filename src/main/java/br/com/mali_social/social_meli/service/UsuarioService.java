@@ -8,12 +8,20 @@ import br.com.mali_social.social_meli.entity.SeguidoresEntity;
 import br.com.mali_social.social_meli.entity.UsuarioEntity;
 import br.com.mali_social.social_meli.repository.SeguidoresRepository;
 import br.com.mali_social.social_meli.repository.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.text.CollationElementIterator;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class UsuarioService {
+    private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
     private final SeguidoresRepository seguidoresRepository;
     private final UsuarioRepository usuarioRepository;
 
@@ -40,21 +48,40 @@ public class UsuarioService {
         return mapQtdSeguidoresparaDTO(numeros_seguidores, vendedor);
     }
 
-    public ListaUsuariosSeguindoresDto listaSeguidores(long UserId){
+    public ListaUsuariosSeguindoresDto listaSeguidores(long UserId, String order){
         UsuarioEntity vendedor = usuarioRepository.findById(UserId).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
         List<SeguidoresEntity> relacao = seguidoresRepository.findByVendedorId(UserId);
-        List<UsuarioDto> seguidores = relacao.stream()
+        List<UsuarioDto> seguidores = new java.util.ArrayList<>(relacao.stream()
                 .map(this::mapRelacaoVendorCompradorDTO)
-                .toList();
+                .toList());
+
+
+        switch (order){
+            case "name_asc":
+                seguidores.sort(Comparator.comparing(UsuarioDto::getNome));
+                break;
+            case "name_desc":
+                seguidores.sort(Comparator.comparing(UsuarioDto::getNome).reversed());
+                break;
+        }
         return mapVendedorECompradorParaDTO(vendedor, seguidores);
     }
 
-    public ListaUsuarioSeguindoDto listaSeguindo(long UserId){
+    public ListaUsuarioSeguindoDto listaSeguindo(long UserId, String order){
         UsuarioEntity comprador = usuarioRepository.findById(UserId).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
         List<SeguidoresEntity> relacao = seguidoresRepository.findByCompradorId(UserId);
-        List<UsuarioDto> seguidores = relacao.stream()
+        List<UsuarioDto> seguidores = new java.util.ArrayList<>(relacao.stream()
                 .map(this::mapRelacaoCompradorVendedorDTO)
-                .toList();
+                .toList());
+
+        switch (order){
+            case "name_asc":
+                seguidores.sort(Comparator.comparing(UsuarioDto::getNome));
+                break;
+            case "name_desc":
+                seguidores.sort(Comparator.comparing(UsuarioDto::getNome).reversed());
+                break;
+        }
         return mapCompradoresEVendedorParaDTO(comprador, seguidores);
     }
 
@@ -81,6 +108,7 @@ public class UsuarioService {
                 usuario.getId(),
                 usuario.getNome()
         );
+
     }
 
     private UsuarioDto mapRelacaoCompradorVendedorDTO(SeguidoresEntity relacao) {
