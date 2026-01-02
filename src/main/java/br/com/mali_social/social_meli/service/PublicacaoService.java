@@ -12,11 +12,15 @@ import br.com.mali_social.social_meli.repository.PublicacaoRepository;
 import br.com.mali_social.social_meli.repository.SeguidoresRepository;
 import br.com.mali_social.social_meli.repository.UsuarioRepository;
 import br.com.mali_social.social_meli.util.Verificacao;
+import org.springframework.cglib.core.Local;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -26,6 +30,10 @@ public class PublicacaoService {
     private final UsuarioRepository usuarioRepository;
     private final SeguidoresRepository seguidoresRepository;
     private final ProdutoService produtoService;
+    private final Verificacao verificacao = new Verificacao();
+
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public PublicacaoService (PublicacaoRepository publicacaoRepository, UsuarioRepository usuarioRepository, SeguidoresRepository seguidoresRepository, ProdutoService produtoService){
         this.publicacaoRepository = publicacaoRepository;
@@ -36,59 +44,98 @@ public class PublicacaoService {
 
     public String salvarPublicacao(PublicacaoDto publicacaoDto, ProdutosEntity produtosEntity){
         PublicacaoEntity publicacao = new PublicacaoEntity();
+        String msgErro = verificacao.verificaCadastroProduto(publicacaoDto);
+        if(msgErro.isEmpty()){
 
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        publicacao.setData(LocalDate.parse(publicacaoDto.getDate(),formato));
-        publicacao.setCategoria(publicacaoDto.getCategory());
-        publicacao.setPreco(publicacaoDto.getPrice());
-        publicacao.setPreco(publicacaoDto.getPrice());
+            publicacao.setData(LocalDate.parse(publicacaoDto.getDate(),formato));
+            publicacao.setCategoria(publicacaoDto.getCategory());
+            publicacao.setPreco(publicacaoDto.getPrice());
+            publicacao.setPreco(publicacaoDto.getPrice());
 
-        UsuarioEntity usuarioProduto = usuarioRepository.findById(publicacaoDto.getUser_id()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));;
+            UsuarioEntity usuarioProduto = usuarioRepository.findById(publicacaoDto.getUser_id()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));;
 
-        publicacao.setUsuario(usuarioProduto);
+            publicacao.setUsuario(usuarioProduto);
 
-        publicacao.setProduto(produtosEntity);
+            publicacao.setProduto(produtosEntity);
 
-        return (publicacaoRepository.save(publicacao).toString());
+            return (publicacaoRepository.save(publicacao).toString());
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msgErro);
     }
 
-    public ListaPublicacaoUsuariosDto ListaPublicacaoUsuario(Long UserId) {
+    public ListaPublicacaoUsuariosDto ListaPublicacaoUsuario(Long UserId, String order) {
         List<SeguidoresEntity> relacao = seguidoresRepository.findByCompradorId(UserId);
+
+        LocalDate hoje = LocalDate.now();
+        LocalDate dataLimite = hoje.minusWeeks(2);
+
+        List<Long> idsVendedores = relacao.stream()
+                .map(SeguidoresEntity::getVendedor_id)
+                .distinct()
+                .toList();
+
+        List<PublicacaoEntity> publicacoesEnt = new ArrayList<>();
         List<PublicacaoDto> publicacoes = new ArrayList<>();
-        for (int i = 0; i < relacao.size(); i ++ ){
-            List<PublicacaoDto> PublicacaoAux = mapRelacaoPublicaoUsuarioDTO(relacao.get(i));
-            for (int x = 0; x < PublicacaoAux.size(); x ++) {
-                publicacoes.add(PublicacaoAux.get(x));
-            }
+
+        if ("date_desc".equals(order)){
+            System.out.println("date_desc");
+            publicacoesEnt = publicacaoRepository.findByUsuarioIdInAndDataBetweenOrderByDataDesc(idsVendedores,dataLimite, hoje);
+        } else {
+            System.out.println("date_asc");
+            publicacoesEnt = publicacaoRepository.findByUsuarioIdInAndDataBetweenOrderByDataAsc(idsVendedores, dataLimite, hoje);
         }
+
+        System.out.println("VALOR DO publicacaoEnt " + publicacoesEnt );
+
+        publicacoes = toDtoList(publicacoesEnt);
+
         return mapPublicacaoUsuario(UserId, publicacoes);
     }
 
-    private List<PublicacaoDto> mapRelacaoPublicaoUsuarioDTO (SeguidoresEntity relacao){
-        List<PublicacaoEntity> publicacoes = publicacaoRepository.findByUsuarioId(relacao.getVendedor_id());
-        if(publicacoes.isEmpty()){
-            return List.of();
+    private PublicacaoDto toDto(PublicacaoEntity entity) {
+        if (entity == null) return null;
+
+        ProdutosEntity prod = entity.getProduto();
+        ProdutoDto produtoDto = null;
+        if (prod != null) {
+            produtoDto = new ProdutoDto(
+                    prod.getNotas(),
+                    prod.getCor(),
+                    prod.getMarca(),
+                    prod.getTipo(),
+                    prod.getNome_produto(),
+                    prod.getId()
+            );
         }
 
-        DateTimeFormatter padraoHora = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return new PublicacaoDto(
+                entity.getId(),
+                entity.getUsuario().getId(),
+                entity.getData().format(FORMATTER),
+                produtoDto,
+                entity.getCategoria(),
+                entity.getPreco(),
+                entity.isPromocao(),
+                entity.getDesconto()
+        );
+    }
 
-        return publicacoes.stream()
-                .map(pub->{
-                    ProdutoDto produtoDto = produtoService.mapProdutoEntityToDto(pub.getProduto());
-                    return new PublicacaoDto(
-                            pub.getId(),
-                            pub.getUsuario().getId(),
-                            pub.getData().format(padraoHora),
-                            produtoDto,
-                            pub.getCategoria(),
-                            pub.getPreco(),
-                            pub.isPromocao(),
-                            pub.getDesconto()
-                    );
-                })
-                .toList();
+    public List<PublicacaoDto> toDtoList(List<PublicacaoEntity> entities) {
+
+        List<PublicacaoDto> dtos = new ArrayList<>();
+
+        if (entities == null) {
+            return dtos;
         }
+
+        for (PublicacaoEntity entity : entities) {
+            dtos.add(toDto(entity));
+        }
+        return dtos;
+    }
+
 
     private ListaPublicacaoUsuariosDto mapPublicacaoUsuario(long UserId, List<PublicacaoDto> publicacoes ){
         return new ListaPublicacaoUsuariosDto(
