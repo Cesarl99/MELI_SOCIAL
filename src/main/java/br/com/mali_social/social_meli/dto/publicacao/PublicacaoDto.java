@@ -1,8 +1,10 @@
-package br.com.mali_social.social_meli.dto;
+package br.com.mali_social.social_meli.dto.publicacao;
+
+import br.com.mali_social.social_meli.dto.produto.ProdutoDto;
 
 public class PublicacaoDto {
-    private Long post_id;
     private Long user_id;
+    private Long post_id;
     private String date;
     private ProdutoDto product;
     private Integer category;
@@ -19,10 +21,6 @@ public class PublicacaoDto {
         this.price = price;
         this.has_promo = has_promo;
         this.discount = discount;
-    }
-
-    public PublicacaoDto() {
-
     }
 
 

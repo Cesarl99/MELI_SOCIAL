@@ -1,7 +1,9 @@
 package br.com.mali_social.social_meli.controller;
 
-import br.com.mali_social.social_meli.dto.ListaPublicacaoUsuariosDto;
-import br.com.mali_social.social_meli.dto.PublicacaoDto;
+import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoDescontoUsuarioDto;
+import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoUsuariosDto;
+import br.com.mali_social.social_meli.dto.publicacao.PublicacaoDto;
+import br.com.mali_social.social_meli.dto.publicacao.QuantidadePublicacaoDescontoDto;
 import br.com.mali_social.social_meli.entity.ProdutosEntity;
 import br.com.mali_social.social_meli.service.ProdutoService;
 import br.com.mali_social.social_meli.service.PublicacaoService;
@@ -19,7 +21,7 @@ public class PublicacaoController {
     private ProdutoService produtoService;
 
     @PostMapping("/publish")
-    public void criarPublicacao(@RequestBody PublicacaoDto publicacaoDto){
+    public void criaPublicacao(@RequestBody PublicacaoDto publicacaoDto){
         ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
         publicacaoService.salvarPublicacao(publicacaoDto, produto);
     }
@@ -27,27 +29,23 @@ public class PublicacaoController {
     @GetMapping("/followed/{userId}/list")
     public ListaPublicacaoUsuariosDto listaPublicacaoUsuario(@PathVariable Long userId,
                                                              @RequestParam(name = "order", required = false, defaultValue = "date_asc") String order){
-        return publicacaoService.ListaPublicacaoUsuario(userId, order);
+        return publicacaoService.listaPublicacaoUsuario(userId, order);
     }
 
     @PostMapping ("/promo-pub")
-    public String criaPublicacaoDesconto(@PathVariable PublicacaoDto publicacaoDto){
-        return publicacaoService.salvarPublicacao(publicacaoDto, null);
+    public void criaPublicacaoDesconto(@PathVariable PublicacaoDto publicacaoDto){
+        ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
+        publicacaoService.salvarPublicacao(publicacaoDto, produto);
+    }
+
+    @GetMapping ("/promo-pub/count")
+    public QuantidadePublicacaoDescontoDto contaPublicacaoDesconto (@RequestParam (name = "user_id", required = true) Long user_id){
+        return publicacaoService.contaPublicacaoDesconto(user_id);
     }
 
     @GetMapping ("/promo-pub/list")
-    public String listaPromocaoUsuario (@RequestParam(name = "user_id") int userId){
-        return ("LISTANDO PROMOÇÓES DO USUARIO COMO O ID " + userId);
+    public ListaPublicacaoDescontoUsuarioDto listaPromocaoUsuario (@RequestParam(name = "user_id", required = true) Long userId){
+        return publicacaoService.listaPublicacaoUsuariosDesconto(userId);
     }
-
-
-//    private Sort mapOrderToSort(String order) {
-//        return switch (order) {
-//            case "date_asc"  -> Sort.by("date").ascending();
-//            case "date_desc" -> Sort.by("date").descending();
-//            default -> throw new IllegalArgumentException("Parâmetro 'order' inválido: " + order);
-//        };
-//    }
-
 
 }

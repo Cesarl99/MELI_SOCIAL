@@ -1,4 +1,4 @@
-package br.com.mali_social.social_meli.dto;
+package br.com.mali_social.social_meli.dto.produto;
 
 public class ProdutoDto {
 
@@ -17,7 +17,6 @@ public class ProdutoDto {
         this.product_name = product_name;
         this.product_id = product_id;
     }
-
 
 
     public Long getProduct_id() {

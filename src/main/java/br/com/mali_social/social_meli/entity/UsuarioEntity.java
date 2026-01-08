@@ -14,6 +14,11 @@ public class UsuarioEntity {
     @Column(nullable = false, length = 100)
     private String nome;
 
+    public UsuarioEntity(Long id, String nome) {
+        Id = id;
+        this.nome = nome;
+    }
+
     public UsuarioEntity(){}
 
     public UsuarioEntity(String nome){

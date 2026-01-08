@@ -1,9 +1,10 @@
 package br.com.mali_social.social_meli.service;
 
-import br.com.mali_social.social_meli.dto.ListaPublicacaoUsuariosDto;
-import br.com.mali_social.social_meli.dto.ProdutoDto;
-import br.com.mali_social.social_meli.dto.PublicacaoDto;
-import br.com.mali_social.social_meli.dto.UsuarioDto;
+import br.com.mali_social.social_meli.dto.produto.ProdutoDto;
+import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoDescontoUsuarioDto;
+import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoUsuariosDto;
+import br.com.mali_social.social_meli.dto.publicacao.PublicacaoDto;
+import br.com.mali_social.social_meli.dto.publicacao.QuantidadePublicacaoDescontoDto;
 import br.com.mali_social.social_meli.entity.ProdutosEntity;
 import br.com.mali_social.social_meli.entity.PublicacaoEntity;
 import br.com.mali_social.social_meli.entity.SeguidoresEntity;
@@ -12,7 +13,6 @@ import br.com.mali_social.social_meli.repository.PublicacaoRepository;
 import br.com.mali_social.social_meli.repository.SeguidoresRepository;
 import br.com.mali_social.social_meli.repository.UsuarioRepository;
 import br.com.mali_social.social_meli.util.Verificacao;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -32,8 +31,7 @@ public class PublicacaoService {
     private final ProdutoService produtoService;
     private final Verificacao verificacao = new Verificacao();
 
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public PublicacaoService (PublicacaoRepository publicacaoRepository, UsuarioRepository usuarioRepository, SeguidoresRepository seguidoresRepository, ProdutoService produtoService){
         this.publicacaoRepository = publicacaoRepository;
@@ -44,35 +42,35 @@ public class PublicacaoService {
 
     public String salvarPublicacao(PublicacaoDto publicacaoDto, ProdutosEntity produtosEntity){
         PublicacaoEntity publicacao = new PublicacaoEntity();
-        String msgErro = verificacao.verificaCadastroProduto(publicacaoDto);
-        if(msgErro.isEmpty()){
+        verificacao.verificaCadastroProduto(publicacaoDto);
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        publicacao.setData(LocalDate.parse(publicacaoDto.getDate(),formato));
+        publicacao.setCategoria(publicacaoDto.getCategory());
+        publicacao.setPreco(publicacaoDto.getPrice());
 
-            publicacao.setData(LocalDate.parse(publicacaoDto.getDate(),formato));
-            publicacao.setCategoria(publicacaoDto.getCategory());
-            publicacao.setPreco(publicacaoDto.getPrice());
-            publicacao.setPreco(publicacaoDto.getPrice());
+        UsuarioEntity usuarioProduto = usuarioRepository.findById(publicacaoDto.getUser_id()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario não encontrado."));
 
-            UsuarioEntity usuarioProduto = usuarioRepository.findById(publicacaoDto.getUser_id()).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));;
+        publicacao.setUsuario(usuarioProduto);
 
-            publicacao.setUsuario(usuarioProduto);
+        publicacao.setProduto(produtosEntity);
 
-            publicacao.setProduto(produtosEntity);
-
-            return (publicacaoRepository.save(publicacao).toString());
-        }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msgErro);
+        return (publicacaoRepository.save(publicacao).toString());
     }
 
-    public ListaPublicacaoUsuariosDto ListaPublicacaoUsuario(Long UserId, String order) {
-        List<SeguidoresEntity> relacao = seguidoresRepository.findByCompradorId(UserId);
+    public ListaPublicacaoUsuariosDto listaPublicacaoUsuario(Long user_id, String order) {
+
+        verificacao.verificaIdUsuario(user_id);
+        UsuarioEntity comprador = usuarioRepository.findById(user_id).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+
+        List<SeguidoresEntity> relacao = seguidoresRepository.findByCompradorId(comprador);
 
         LocalDate hoje = LocalDate.now();
         LocalDate dataLimite = hoje.minusWeeks(2);
 
         List<Long> idsVendedores = relacao.stream()
-                .map(SeguidoresEntity::getVendedor_id)
+                .map(SeguidoresEntity::getVendedorId)
+                .map(UsuarioEntity::getId)
                 .distinct()
                 .toList();
 
@@ -80,18 +78,36 @@ public class PublicacaoService {
         List<PublicacaoDto> publicacoes = new ArrayList<>();
 
         if ("date_desc".equals(order)){
-            System.out.println("date_desc");
             publicacoesEnt = publicacaoRepository.findByUsuarioIdInAndDataBetweenOrderByDataDesc(idsVendedores,dataLimite, hoje);
         } else {
-            System.out.println("date_asc");
             publicacoesEnt = publicacaoRepository.findByUsuarioIdInAndDataBetweenOrderByDataAsc(idsVendedores, dataLimite, hoje);
         }
 
-        System.out.println("VALOR DO publicacaoEnt " + publicacoesEnt );
-
         publicacoes = toDtoList(publicacoesEnt);
+        return mapPublicacaoUsuario(user_id, publicacoes);
+    }
 
-        return mapPublicacaoUsuario(UserId, publicacoes);
+    public QuantidadePublicacaoDescontoDto contaPublicacaoDesconto (Long user_id){
+        verificacao.verificaIdUsuario(user_id);
+        UsuarioEntity vendedor = usuarioRepository.findById(user_id).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+        int quantidadePromocao = publicacaoRepository.countByUsuarioIdAndPromocao(user_id, true);
+
+        return new QuantidadePublicacaoDescontoDto(
+                user_id,
+                vendedor.getNome(),
+                quantidadePromocao
+        );
+    }
+
+    public ListaPublicacaoDescontoUsuarioDto listaPublicacaoUsuariosDesconto(Long user_id){
+        verificacao.verificaIdUsuario(user_id);
+        UsuarioEntity vendedor = usuarioRepository.findById(user_id).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+        List<PublicacaoEntity> publicacoesEnt = publicacaoRepository.findByUsuarioIdAndPromocaoOrderByDataAsc(user_id, true);
+        return new ListaPublicacaoDescontoUsuarioDto(
+                user_id,
+                vendedor.getNome(),
+                toDtoList(publicacoesEnt)
+        );
     }
 
     private PublicacaoDto toDto(PublicacaoEntity entity) {
@@ -122,7 +138,7 @@ public class PublicacaoService {
         );
     }
 
-    public List<PublicacaoDto> toDtoList(List<PublicacaoEntity> entities) {
+    private List<PublicacaoDto> toDtoList(List<PublicacaoEntity> entities) {
 
         List<PublicacaoDto> dtos = new ArrayList<>();
 

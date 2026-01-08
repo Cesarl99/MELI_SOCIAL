@@ -1,4 +1,6 @@
-package br.com.mali_social.social_meli.dto;
+package br.com.mali_social.social_meli.dto.seguidor;
+
+import br.com.mali_social.social_meli.dto.usuario.UsuarioDto;
 
 import java.util.List;
 

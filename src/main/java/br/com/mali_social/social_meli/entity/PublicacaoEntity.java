@@ -1,6 +1,5 @@
 package br.com.mali_social.social_meli.entity;
 
-import br.com.mali_social.social_meli.dto.PublicacaoDto;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -38,10 +37,12 @@ public class PublicacaoEntity {
 
     public PublicacaoEntity(){}
 
-    public PublicacaoEntity(long id, long produtoId, long userId, double desconto, boolean promocao, Double preco, int categoria, LocalDate data) {
+    public PublicacaoEntity(long id, ProdutosEntity produto, UsuarioEntity usuario, boolean promocao, double desconto, Double preco, int categoria, LocalDate data) {
         Id = id;
-        this.desconto = desconto;
+        this.produto = produto;
+        this.usuario = usuario;
         this.promocao = promocao;
+        this.desconto = desconto;
         this.preco = preco;
         this.categoria = categoria;
         this.data = data;

@@ -1,4 +1,4 @@
-package br.com.mali_social.social_meli.dto;
+package br.com.mali_social.social_meli.dto.usuario;
 
 
 public class UsuarioDto {
@@ -10,20 +10,24 @@ public class UsuarioDto {
         this.user_name = nome;
     }
 
-    public long getId() {
+    public UsuarioDto() {
+
+    }
+
+    public long getUser_id() {
         return user_id;
     }
 
-    public void setId(int userId) {
-        user_id = userId;
+    public void setUser_id(long user_id) {
+        this.user_id = user_id;
     }
 
-    public String getNome() {
+    public String getUser_name() {
         return user_name;
     }
 
-    public void setNome(String username) {
-        user_name = username;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 
     @Override

@@ -10,17 +10,20 @@ public class SeguidoresEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false)
-    private long compradorId;
+    @ManyToOne
+    @JoinColumn(name = "vendedor_id", nullable = false)
+    private UsuarioEntity vendedorId;
 
-    @Column(nullable = false)
-    private long vendedorId;
+    @ManyToOne
+    @JoinColumn(name = "comprador_id", nullable = false)
+    private UsuarioEntity compradorId;
 
     public SeguidoresEntity() {}
 
-    public SeguidoresEntity(long idComprador, long idVendedor) {
-        this.compradorId = idComprador;
-        this.vendedorId = idVendedor;
+    public SeguidoresEntity(UsuarioEntity vendedorId, long id, UsuarioEntity compradorId) {
+        this.vendedorId = vendedorId;
+        this.id = id;
+        this.compradorId = compradorId;
     }
 
     public long getId() {
@@ -31,28 +34,19 @@ public class SeguidoresEntity {
         this.id = id;
     }
 
-    public long getComprador_id() {
+    public UsuarioEntity getCompradorId() {
         return compradorId;
     }
 
-    public void setComprador_id(long compradorId) { // nome igual ao campo
+    public void setCompradorId(UsuarioEntity compradorId) {
         this.compradorId = compradorId;
     }
 
-    public long getVendedor_id() {
+    public UsuarioEntity getVendedorId() {
         return vendedorId;
     }
 
-    public void setVendedor_id(long vendedorId) {
+    public void setVendedorId(UsuarioEntity vendedorId) {
         this.vendedorId = vendedorId;
-    }
-
-    @Override
-    public String toString() {
-        return "SeguidoresEntity{" +
-                "id=" + id +
-                ", compradorId=" + compradorId +
-                ", vendedorId=" + vendedorId +
-                '}';
     }
 }

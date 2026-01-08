@@ -1,4 +1,4 @@
-package br.com.mali_social.social_meli.dto;
+package br.com.mali_social.social_meli.dto.publicacao;
 
 import java.util.List;
 

@@ -1,9 +1,8 @@
 package br.com.mali_social.social_meli.service;
 
-import br.com.mali_social.social_meli.dto.ProdutoDto;
+import br.com.mali_social.social_meli.dto.produto.ProdutoDto;
 import br.com.mali_social.social_meli.entity.ProdutosEntity;
 import br.com.mali_social.social_meli.repository.ProdutoRepository;
-import br.com.mali_social.social_meli.util.Verificacao;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,15 +27,4 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
-
-    public ProdutoDto mapProdutoEntityToDto(ProdutosEntity produtosEntity) {
-        return new ProdutoDto(
-                produtosEntity.getNotas(),
-                produtosEntity.getCor(),
-                produtosEntity.getMarca(),
-                produtosEntity.getTipo(),
-                produtosEntity.getNome_produto(),
-                produtosEntity.getId()
-        );
-    }
 }
