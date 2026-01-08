@@ -12,8 +12,8 @@ import java.util.List;
 
 @Repository
 public interface PublicacaoRepository extends JpaRepository<PublicacaoEntity, Long> {
-
     List<PublicacaoEntity> findByUsuarioIdInAndDataBetweenOrderByDataAsc(List<Long> usuarioIds, LocalDate dataInicial, LocalDate dataFinal);
     List<PublicacaoEntity> findByUsuarioIdInAndDataBetweenOrderByDataDesc(List<Long> usuarioIds,LocalDate dataInicial, LocalDate dataFinal);
-
+    int countByUsuarioIdAndPromocao(Long usuarioId, boolean promocao);
+    List<PublicacaoEntity> findByUsuarioIdAndPromocaoOrderByDataAsc(Long usuarioId, boolean promocao);
 }
