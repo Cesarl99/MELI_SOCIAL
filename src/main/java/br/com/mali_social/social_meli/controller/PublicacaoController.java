@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("products")
+@CrossOrigin(origins = "http://localhost:5173")
 public class PublicacaoController {
 
     @Autowired
@@ -22,6 +23,7 @@ public class PublicacaoController {
 
     @PostMapping("/publish")
     public void criaPublicacao(@RequestBody PublicacaoDto publicacaoDto){
+        System.out.println("recebendo a publicacao");
         ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
         publicacaoService.salvarPublicacao(publicacaoDto, produto);
     }

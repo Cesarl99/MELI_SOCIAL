@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("users")
+@CrossOrigin(origins = "http://localhost:5173")
 public class UsuarioController {
 
     @Autowired
@@ -21,6 +22,14 @@ public class UsuarioController {
     public void salvaUsuario(@RequestBody UsuarioDto user){
         System.out.println(user);
         usuarioService.salvarUsuario(user);
+    }
+
+    @GetMapping("{userId}")
+    public UsuarioDto pesquisaUsuario(@PathVariable long userId){
+        System.out.println("pesquisaUsuario");
+        String nomeUsuarios = "Usuario" + userId;
+        UsuarioDto usuarioDto = new UsuarioDto(userId, nomeUsuarios);
+        return usuarioDto;
     }
 
     @PostMapping("/{userId}/follow/{userIdToFollow}")
@@ -49,7 +58,6 @@ public class UsuarioController {
     public void deixarSeguir (@PathVariable int userId, @PathVariable int userIdToUnfollow){
         usuarioService.deixarDeSeguir(userId, userIdToUnfollow);
     }
-
 
 
 }
