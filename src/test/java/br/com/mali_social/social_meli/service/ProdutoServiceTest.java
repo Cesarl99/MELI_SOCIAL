@@ -32,7 +32,7 @@ public class ProdutoServiceTest {
     void TestSalvarProdutoCorreto(){
         // ARRANGE
         ProdutoDto produto = new ProdutoDto(
-                "Edição Especial", "Verde", "Brasil", "Cadeira", "Cadeira Gamer");
+                "Cadeira", "Edição especial", "Verde", 14l, "Brasil", "cadeira Gamer");
 
         // ACT
         produtoService.salvarProduto(produto);

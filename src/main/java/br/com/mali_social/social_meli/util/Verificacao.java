@@ -26,6 +26,9 @@ public class Verificacao {
         else if (publicacaoDto.getPrice() == null || publicacaoDto.getPrice() > precoMax){
             ret = "O campo Produto não pode estar vazio / O preço máximo por produto é de 10.000.000.";
         }
+        else if (publicacaoDto.getProduct().getProduct_id() == 0 || publicacaoDto.getProduct().getProduct_id() == null){
+            ret = "O id do Produto não pode estar vazio / id do produto deve ser maior que zero.";
+        }
         else if (Verificacao.verificadorStrigs(publicacaoDto.getProduct().getProduct_name()) || publicacaoDto.getProduct().getProduct_name().length() > 40){
             ret = "O campo Nome do produto não pode estar vazio / O comprimento não pode exceder 40 caracteres / O campo Nome do produto não pode conter caracteres especiais.";
         }

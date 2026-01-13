@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 public class ProdutosEntity {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-
     private long Id;
 
     @Column(nullable = false, length = 40)

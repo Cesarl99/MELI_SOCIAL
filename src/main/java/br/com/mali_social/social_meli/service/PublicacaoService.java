@@ -42,6 +42,7 @@ public class PublicacaoService {
 
     public String salvarPublicacao(PublicacaoDto publicacaoDto, ProdutosEntity produtosEntity){
         PublicacaoEntity publicacao = new PublicacaoEntity();
+        publicacaoDto.getProduct().setProduct_id(produtosEntity.getId());
         verificacao.verificaCadastroProduto(publicacaoDto);
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
@@ -123,6 +124,7 @@ public class PublicacaoService {
                     prod.getNotas(),
                     prod.getCor(),
                     prod.getMarca(),
+                    prod.getId(),
                     prod.getTipo(),
                     prod.getNome_produto()
             );

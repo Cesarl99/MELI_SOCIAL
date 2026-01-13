@@ -23,8 +23,8 @@ public class PublicacaoController {
 
     @PostMapping("/publish")
     public void criaPublicacao(@RequestBody PublicacaoDto publicacaoDto){
-        System.out.println("recebendo a publicacao");
         ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
+        System.out.println("valor do produto"+ produto.toString());
         publicacaoService.salvarPublicacao(publicacaoDto, produto);
     }
 
@@ -36,11 +36,9 @@ public class PublicacaoController {
 
     @PostMapping ("/promo-pub")
     public void criaPublicacaoDesconto(@RequestBody PublicacaoDto publicacaoDto){
-
-        System.out.println("publicacao recebida" + publicacaoDto);
         ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
+        System.out.println("valor do produto"+ produto.toString());
         String ret = publicacaoService.salvarPublicacao(publicacaoDto, produto);
-        System.out.println("valor do ret" + ret);
     }
 
     @GetMapping ("/promo-pub/count")

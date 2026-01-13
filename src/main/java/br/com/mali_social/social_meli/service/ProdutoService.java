@@ -23,7 +23,10 @@ public class ProdutoService {
         produto.setCor(produtoDto.getColor());
         produto.setNotas(produtoDto.getNotes());
 
-        return produtoRepository.save(produto);
+        ProdutosEntity salvo = produtoRepository.save(produto);
+        Long idGerado = salvo.getId();
+        salvo.setId(idGerado);
+        return salvo;
     }
 
 }

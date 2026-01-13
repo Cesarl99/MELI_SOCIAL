@@ -7,13 +7,24 @@ public class ProdutoDto {
     private String brand;
     private String color;
     private String notes;
+    private Long product_id;
 
-    public ProdutoDto(String notes, String color, String brand, String type, String product_name) {
+    public ProdutoDto(String product_name, String notes, String color, Long product_id, String brand, String type) {
+        this.product_name = product_name;
         this.notes = notes;
         this.color = color;
+        this.product_id = product_id;
         this.brand = brand;
         this.type = type;
-        this.product_name = product_name;
+    }
+
+
+    public Long getProduct_id() {
+        return product_id;
+    }
+
+    public void setProduct_id(Long product_id) {
+        this.product_id = product_id;
     }
 
     public String getNotes() {
