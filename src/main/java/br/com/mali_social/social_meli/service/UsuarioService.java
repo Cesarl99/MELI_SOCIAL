@@ -34,6 +34,16 @@ public class UsuarioService {
         usuarioRepository.save(usuarioEntity);
     }
 
+    public UsuarioDto pesquisaUsuarios(long UserId){
+        UsuarioEntity usuarioEnt = usuarioRepository.findById(UserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario (comprador) não encontrado."));
+
+
+        return new UsuarioDto(
+                usuarioEnt.getId(),
+                usuarioEnt.getNome()
+        );
+    }
+
     public void seguir(long UserId, long userIdToFollow){
         SeguidoresEntity seguidores = new SeguidoresEntity();
         verificacao.verificaIdUsuario(UserId);

@@ -25,11 +25,8 @@ public class UsuarioController {
     }
 
     @GetMapping("{userId}")
-    public UsuarioDto pesquisaUsuario(@PathVariable long userId){
-        System.out.println("pesquisaUsuario");
-        String nomeUsuarios = "Usuario" + userId;
-        UsuarioDto usuarioDto = new UsuarioDto(userId, nomeUsuarios);
-        return usuarioDto;
+    public UsuarioDto pesquisaUsuario(@PathVariable long userId) {
+        return usuarioService.pesquisaUsuarios(userId);
     }
 
     @PostMapping("/{userId}/follow/{userIdToFollow}")
