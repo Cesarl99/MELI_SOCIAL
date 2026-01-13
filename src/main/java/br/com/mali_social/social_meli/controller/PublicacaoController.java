@@ -35,9 +35,12 @@ public class PublicacaoController {
     }
 
     @PostMapping ("/promo-pub")
-    public void criaPublicacaoDesconto(@PathVariable PublicacaoDto publicacaoDto){
+    public void criaPublicacaoDesconto(@RequestBody PublicacaoDto publicacaoDto){
+
+        System.out.println("publicacao recebida" + publicacaoDto);
         ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
-        publicacaoService.salvarPublicacao(publicacaoDto, produto);
+        String ret = publicacaoService.salvarPublicacao(publicacaoDto, produto);
+        System.out.println("valor do ret" + ret);
     }
 
     @GetMapping ("/promo-pub/count")

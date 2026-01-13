@@ -48,6 +48,9 @@ public class PublicacaoService {
         publicacao.setData(LocalDate.parse(publicacaoDto.getDate(),formato));
         publicacao.setCategoria(publicacaoDto.getCategory());
         publicacao.setPreco(publicacaoDto.getPrice());
+        publicacao.setPromocao(publicacaoDto.isHas_promo());
+        publicacao.setDesconto(publicacaoDto.getDiscount());
+
 
         UsuarioEntity usuarioProduto = usuarioRepository.findById(publicacaoDto.getUser_id()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario não encontrado."));
 
@@ -121,8 +124,7 @@ public class PublicacaoService {
                     prod.getCor(),
                     prod.getMarca(),
                     prod.getTipo(),
-                    prod.getNome_produto(),
-                    prod.getId()
+                    prod.getNome_produto()
             );
         }
 

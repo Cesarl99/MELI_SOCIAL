@@ -17,7 +17,6 @@ public class ProdutoService {
 
         ProdutosEntity produto = new ProdutosEntity();
 
-        produto.setId(produtoDto.getProduct_id());
         produto.setNome_produto(produtoDto.getProduct_name());
         produto.setTipo(produtoDto.getType());
         produto.setMarca(produtoDto.getBrand());

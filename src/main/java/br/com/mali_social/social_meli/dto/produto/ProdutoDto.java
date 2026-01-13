@@ -2,29 +2,18 @@ package br.com.mali_social.social_meli.dto.produto;
 
 public class ProdutoDto {
 
-    private Long product_id;
     private String product_name;
     private String type;
     private String brand;
     private String color;
     private String notes;
 
-    public ProdutoDto(String notes, String color, String brand, String type, String product_name, Long product_id) {
+    public ProdutoDto(String notes, String color, String brand, String type, String product_name) {
         this.notes = notes;
         this.color = color;
         this.brand = brand;
         this.type = type;
         this.product_name = product_name;
-        this.product_id = product_id;
-    }
-
-
-    public Long getProduct_id() {
-        return product_id;
-    }
-
-    public void setProduct_id(Long product_id) {
-        this.product_id = product_id;
     }
 
     public String getNotes() {
@@ -70,7 +59,6 @@ public class ProdutoDto {
     @Override
     public String toString() {
         return "ProdutoDto{" +
-                "product_id=" + product_id +
                 ", product_name='" + product_name + '\'' +
                 ", type='" + type + '\'' +
                 ", brand='" + brand + '\'' +

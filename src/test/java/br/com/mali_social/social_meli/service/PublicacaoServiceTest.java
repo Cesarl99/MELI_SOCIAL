@@ -50,7 +50,7 @@ public class PublicacaoServiceTest {
         long vendedorId = 10L;
         // ARRANGE
         ProdutoDto produto = new ProdutoDto(
-                "Edição Especial", "Verde", "Brasil", "Cadeira", "Cadeira Gamer", 14l
+                "Edição Especial", "Verde", "Brasil", "Cadeira", "Cadeira Gamer"
         );
 
         PublicacaoDto publicacao = new PublicacaoDto(
