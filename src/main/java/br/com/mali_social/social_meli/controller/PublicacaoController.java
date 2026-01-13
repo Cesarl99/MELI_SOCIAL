@@ -24,7 +24,6 @@ public class PublicacaoController {
     @PostMapping("/publish")
     public void criaPublicacao(@RequestBody PublicacaoDto publicacaoDto){
         ProdutosEntity produto = produtoService.salvarProduto(publicacaoDto.getProduct());
-        System.out.println("valor do produto"+ produto.toString());
         publicacaoService.salvarPublicacao(publicacaoDto, produto);
     }
 
