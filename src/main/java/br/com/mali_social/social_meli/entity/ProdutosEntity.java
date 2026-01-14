@@ -28,12 +28,13 @@ public class ProdutosEntity {
 
     public ProdutosEntity(){}
 
-    public ProdutosEntity (String nomeProduto, String tipo, String marca, String cor, String notas){
+    public ProdutosEntity (String nomeProduto, String tipo, String marca, String cor, String notas, Long id){
         this.nome_produto = nomeProduto;
         this.tipo = tipo;
         this.marca = marca;
         this.cor = cor;
         this.notas = notas;
+        this.Id = id;
     }
 
     public long getId() {

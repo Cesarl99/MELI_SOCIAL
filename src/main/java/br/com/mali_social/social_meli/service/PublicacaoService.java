@@ -52,9 +52,7 @@ public class PublicacaoService {
         publicacao.setPromocao(publicacaoDto.isHas_promo());
         publicacao.setDesconto(publicacaoDto.getDiscount());
 
-
-        UsuarioEntity usuarioProduto = usuarioRepository.findById(publicacaoDto.getUser_id()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario não encontrado."));
-
+        UsuarioEntity usuarioProduto = usuarioRepository.findById(publicacaoDto.getUser_id()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O id não pode estar vazio id deve ser maior que zero"));
         publicacao.setUsuario(usuarioProduto);
 
         publicacao.setProduto(produtosEntity);
@@ -65,7 +63,7 @@ public class PublicacaoService {
     public ListaPublicacaoUsuariosDto listaPublicacaoUsuario(Long user_id, String order) {
 
         verificacao.verificaIdUsuario(user_id);
-        UsuarioEntity comprador = usuarioRepository.findById(user_id).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+        UsuarioEntity comprador = usuarioRepository.findById(user_id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario não encontrado"));
 
         List<SeguidoresEntity> relacao = seguidoresRepository.findByCompradorId(comprador);
 
@@ -93,7 +91,7 @@ public class PublicacaoService {
 
     public QuantidadePublicacaoDescontoDto contaPublicacaoDesconto (Long user_id){
         verificacao.verificaIdUsuario(user_id);
-        UsuarioEntity vendedor = usuarioRepository.findById(user_id).orElseThrow(() -> new RuntimeException("Usuario não encontrado"));
+        UsuarioEntity vendedor = usuarioRepository.findById(user_id).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario não encontrado"));
         int quantidadePromocao = publicacaoRepository.countByUsuarioIdAndPromocao(user_id, true);
 
         return new QuantidadePublicacaoDescontoDto(

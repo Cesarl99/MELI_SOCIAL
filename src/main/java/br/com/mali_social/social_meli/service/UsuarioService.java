@@ -36,8 +36,6 @@ public class UsuarioService {
 
     public UsuarioDto pesquisaUsuarios(long UserId){
         UsuarioEntity usuarioEnt = usuarioRepository.findById(UserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario (comprador) não encontrado."));
-
-
         return new UsuarioDto(
                 usuarioEnt.getId(),
                 usuarioEnt.getNome()

@@ -20,7 +20,6 @@ public class UsuarioController {
 
     @PostMapping
     public void salvaUsuario(@RequestBody UsuarioDto user){
-        System.out.println(user);
         usuarioService.salvarUsuario(user);
     }
 
