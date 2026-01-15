@@ -18,6 +18,8 @@ public class ProdutoDto {
         this.type = type;
     }
 
+    public ProdutoDto() {
+    }
 
     public Long getProduct_id() {
         return product_id;

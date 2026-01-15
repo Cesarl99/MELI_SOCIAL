@@ -467,7 +467,6 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(relacoes.get(1).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(1).getVendedorId()));
         when(usuarioRepository.findById(relacoes.get(2).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(2).getVendedorId()));
 
-
         // ACT
         ListaUsuarioSeguindoDto dto = usuarioService.listaSeguindo(compradorId, "name_desc");
 

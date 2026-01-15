@@ -2,6 +2,7 @@ package br.com.mali_social.social_meli.service;
 
 
 import br.com.mali_social.social_meli.dto.produto.ProdutoDto;
+import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoDescontoUsuarioDto;
 import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoUsuariosDto;
 import br.com.mali_social.social_meli.dto.publicacao.PublicacaoDto;
 import br.com.mali_social.social_meli.dto.publicacao.QuantidadePublicacaoDescontoDto;
@@ -300,5 +301,61 @@ public class PublicacaoServiceTest {
         assertEquals(vendedor.getId(), QtdPublicacaoDesconto.getUser_id());
         assertEquals(vendedor.getNome(), QtdPublicacaoDesconto.getUser_name());
 
+    }
+
+    @Test
+    void listaPublicacaoComDescontoCorreto() {
+        LocalDate data;
+        long userid = 10L;
+
+        UsuarioEntity usuario = new UsuarioEntity(userid, "Luis");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        ProdutosEntity produtoA = new ProdutosEntity(
+                "Iphone 15 PRO", "Smartphone", "Apple",
+                "Branco", "Seminovo", 1L
+        );
+        UsuarioEntity usuarioA = new UsuarioEntity(14L, "João");
+        data = LocalDate.parse("10-01-2026", formatter);
+        PublicacaoEntity puba = new PublicacaoEntity(
+                1L, produtoA, usuarioA, true, 0, 8000.00, 15, data
+        );
+
+        ProdutosEntity produtoB = new ProdutosEntity(
+                "Fone de Ouvindo Turbo Max", "Perifericos", "JBL",
+                "Preto", "Novo", 2L
+        );
+        UsuarioEntity usuarioB = new UsuarioEntity(15L, "Julio");
+        data = LocalDate.parse("01-01-2026", formatter);
+        PublicacaoEntity pubb = new PublicacaoEntity(
+                2L, produtoB, usuarioB, false, 0, 260.00, 11, data
+        );
+
+
+        ProdutosEntity produtoC = new ProdutosEntity(
+                "Garrafa Termica", "Utensilios", "Stanley",
+                "Cinza", "1 litro", 3L
+        );
+        UsuarioEntity usuarioC = new UsuarioEntity(16L, "Maria");
+        data = LocalDate.parse("16-01-2026", formatter);
+        PublicacaoEntity pubc = new PublicacaoEntity(
+                3L, produtoC, usuarioC, true, 0, 60.00, 12, data
+        );
+
+        // mocks
+        when(usuarioRepository.findById(userid)).thenReturn(Optional.of(usuario));
+        when(publicacaoRepository.findByUsuarioIdAndPromocaoOrderByDataAsc(userid,true)).thenReturn(List.of(puba, pubc));
+
+        // ACT
+        ListaPublicacaoDescontoUsuarioDto ProdutoPromocao = publicacaoService.listaPublicacaoUsuariosDesconto(userid);
+
+        // ASSERT
+        assertNotNull(ProdutoPromocao);
+        assertEquals(userid, ProdutoPromocao.getUser_id());
+        assertEquals(2, ProdutoPromocao.getPosts().size());
+
+        assertTrue(ProdutoPromocao.getPosts().get(0).isHas_promo());
+        assertTrue(ProdutoPromocao.getPosts().get(1).isHas_promo());
     }
 }
