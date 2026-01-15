@@ -14,6 +14,7 @@ import br.com.mali_social.social_meli.repository.ProdutoRepository;
 import br.com.mali_social.social_meli.repository.PublicacaoRepository;
 import br.com.mali_social.social_meli.repository.SeguidoresRepository;
 import br.com.mali_social.social_meli.repository.UsuarioRepository;
+import br.com.mali_social.social_meli.util.Verificacao;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -48,11 +49,14 @@ public class PublicacaoServiceTest {
     private ProdutoRepository produtoRepository;
 
     @Mock
+    private Verificacao verificacao;
+
+    @Mock
     private SeguidoresRepository seguidoresRepository;
     DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Test
-    void TestSalvarPublicacaoCorreto(){
+    void testSalvarPublicacaoCorreto(){
         long vendedorId = 10L;
         // ARRANGE
         ProdutoDto produto = new ProdutoDto(
@@ -92,7 +96,7 @@ public class PublicacaoServiceTest {
     }
 
     @Test
-    void TestSalvarPublicacaoErroCadastro() {
+    void testSalvarPublicacaoErroCadastro() {
         long vendedorId = 10L;
         // ARRANGE
         ProdutoDto produto = new ProdutoDto(
@@ -125,7 +129,7 @@ public class PublicacaoServiceTest {
     }
 
     @Test
-    void ListaPublicacaoUsuariosDtoDesc() {
+    void testListaPublicacaoUsuariosDtoDescCorreto() {
         LocalDate data;
         long userid = 10L;
 
@@ -205,7 +209,7 @@ public class PublicacaoServiceTest {
     }
 
     @Test
-    void ListaPublicacaoUsuariosDtoAsc() {
+    void testListaPublicacaoUsuariosDtoAscCorreto() {
         LocalDate data;
         long userid = 10L;
 
@@ -284,7 +288,7 @@ public class PublicacaoServiceTest {
     }
 
     @Test
-    void contarPublicacaoPromocaoCorreto(){
+    void testContarPublicacaoPromocaoCorreto(){
         Long vendedor_id = 17L;
         int QtdPromocao = 20;
         UsuarioEntity vendedor = new UsuarioEntity(
@@ -304,7 +308,7 @@ public class PublicacaoServiceTest {
     }
 
     @Test
-    void listaPublicacaoComDescontoCorreto() {
+    void TestlistaPublicacaoComDescontoCorreto() {
         LocalDate data;
         long userid = 10L;
 
@@ -354,8 +358,78 @@ public class PublicacaoServiceTest {
         assertNotNull(ProdutoPromocao);
         assertEquals(userid, ProdutoPromocao.getUser_id());
         assertEquals(2, ProdutoPromocao.getPosts().size());
-
         assertTrue(ProdutoPromocao.getPosts().get(0).isHas_promo());
         assertTrue(ProdutoPromocao.getPosts().get(1).isHas_promo());
+    }
+
+    @Test
+    void TestdeveBuscarPublicacoesDasDuasUltimasSemanasOrdenadasPorDataDesc() {
+        Long userId = 1L;
+
+        UsuarioEntity comprador = new UsuarioEntity();
+        comprador.setId(userId);
+
+        when(usuarioRepository.findById(userId))
+                .thenReturn(Optional.of(comprador));
+
+        UsuarioEntity vendedor1 = new UsuarioEntity();
+        vendedor1.setId(10L);
+        UsuarioEntity vendedor2 = new UsuarioEntity();
+        vendedor2.setId(20L);
+
+        SeguidoresEntity seg1 = new SeguidoresEntity();
+        seg1.setVendedorId(vendedor1);
+        seg1.setCompradorId(comprador);
+
+        SeguidoresEntity seg2 = new SeguidoresEntity();
+        seg2.setVendedorId(vendedor2);
+        seg2.setCompradorId(comprador);
+
+        when(seguidoresRepository.findByCompradorId(comprador))
+                .thenReturn(List.of(seg1, seg2));
+
+        LocalDate hojeEsperado = LocalDate.of(2026, 1, 15);
+        LocalDate dataLimiteEsperada = hojeEsperado.minusWeeks(2);
+
+
+        PublicacaoEntity pub1 = new PublicacaoEntity();
+        pub1.setUsuario(vendedor1);
+        pub1.setData(hojeEsperado.minusDays(1));
+
+        PublicacaoEntity pub2 = new PublicacaoEntity();
+        pub2.setUsuario(vendedor2);
+        pub2.setData(hojeEsperado.minusDays(5));
+
+        when(publicacaoRepository
+                .findByUsuarioIdInAndDataBetweenOrderByDataDesc(
+                        anyList(), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(pub1, pub2));
+
+        // Act
+        ListaPublicacaoUsuariosDto resultado =
+                publicacaoService.listaPublicacaoUsuario(userId, "date_desc");
+
+        // Assert
+
+        ArgumentCaptor<List<Long>> idsCaptor = ArgumentCaptor.forClass((Class) List.class);
+        ArgumentCaptor<LocalDate> dataInicioCaptor = ArgumentCaptor.forClass(LocalDate.class);
+        ArgumentCaptor<LocalDate> dataFimCaptor = ArgumentCaptor.forClass(LocalDate.class);
+
+        verify(publicacaoRepository).findByUsuarioIdInAndDataBetweenOrderByDataDesc(
+                idsCaptor.capture(),
+                dataInicioCaptor.capture(),
+                dataFimCaptor.capture()
+        );
+
+
+        List<Long> idsPassados = idsCaptor.getValue();
+        assertTrue(idsPassados.contains(10L));
+        assertTrue(idsPassados.contains(20L));
+        assertEquals(2, idsPassados.size());
+
+        assertEquals(dataLimiteEsperada, dataInicioCaptor.getValue());
+        assertEquals(hojeEsperado, dataFimCaptor.getValue());
+
+        assertNotNull(resultado);
     }
 }

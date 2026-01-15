@@ -205,7 +205,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void TestContarSeguidoresExcecaoIdInvalido(){
+    void testContarSeguidoresExcecaoIdInvalido(){
 
         // arrange
         long vendedorId = 0;
@@ -228,7 +228,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguidoresDeveRetornarOrdenadoPorNomeAsc() {
+    void testListaSeguidoresDeveRetornarOrdenadoPorNomeAsc() {
         // ARRANGE
         long vendedorId = 5;
 
@@ -281,7 +281,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguidoresDeveRetornarOrdenadoPorNomeDesc() {
+    void testListaSeguidoresDeveRetornarOrdenadoPorNomeDesc() {
         // ARRANGE
         long vendedorId = 5;
 
@@ -334,7 +334,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguidoresUsuarioNaoCadastro(){
+    void testListaSeguidoresUsuarioNaoCadastro(){
 
         // arrange
         long vendedorId = 14;
@@ -356,7 +356,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguidoresExcecaoUsuarioInvalido(){
+    void testListaSeguidoresExcecaoUsuarioInvalido(){
 
         // arrange
         long vendedorId = 0;
@@ -378,7 +378,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguindoDeveRetornarOrdenadoPorNomeAsc() {
+    void testListaSeguindoDeveRetornarOrdenadoPorNomeAsc() {
         // ARRANGE
         long compradorId = 5;
 
@@ -431,7 +431,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguindoDeveRetornarOrdenadoPorNomeDesc() {
+    void testListaSeguindoDeveRetornarOrdenadoPorNomeDesc() {
         // ARRANGE
         long compradorId = 5;
 
@@ -483,7 +483,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguindoUsuarioNaoCadastro(){
+    void testListaSeguindoUsuarioNaoCadastro(){
 
         // arrange
         long compradorId = 14;
@@ -505,7 +505,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void listaSeguindoExcecaoUsuarioInvalido(){
+    void testListaSeguindoExcecaoUsuarioInvalido(){
 
         // arrange
         long vendedorId = 0;
@@ -526,7 +526,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void DeixarSeguirCorreto(){
+    void testDeixarSeguirCorreto(){
         // ARRANGE
         long compradorId = 10;
         long vendedorId = 20;
@@ -565,7 +565,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void DeixarSeguirExcecaoVendedorNaoCadastra(){
+    void testDeixarSeguirExcecaoVendedorNaoCadastra(){
         // ARRANGE
         long compradorId = 10;
         long vendedorId = 20;
@@ -592,7 +592,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void DeixarSeguirExcecaoCompradorNaoCadastra(){
+    void testDeixarSeguirExcecaoCompradorNaoCadastra(){
         // ARRANGE
         long compradorId = 10;
         long vendedorId = 20;
@@ -615,7 +615,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void DeixarSeguirExcecaoUsuarioInvalido(){
+    void testDeixarSeguirExcecaoUsuarioInvalido(){
         // ARRANGE
         long compradorId = 0;
         long vendedorId = 10;

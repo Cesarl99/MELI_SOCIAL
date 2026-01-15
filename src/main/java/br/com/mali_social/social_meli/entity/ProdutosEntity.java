@@ -1,7 +1,6 @@
 package br.com.mali_social.social_meli.entity;
 
 
-import br.com.mali_social.social_meli.service.PublicacaoService;
 import jakarta.persistence.*;
 
 @Entity
