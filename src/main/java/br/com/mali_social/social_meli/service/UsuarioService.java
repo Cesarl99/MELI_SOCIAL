@@ -48,6 +48,10 @@ public class UsuarioService {
         verificacao.verificaIdUsuario(userIdToFollow);
         UsuarioEntity vendedor = usuarioRepository.findById(userIdToFollow).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario (vendedor) não encontrado."));
         UsuarioEntity comprador = usuarioRepository.findById(UserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario (comprador) não encontrado."));
+        boolean jaExiste = seguidoresRepository.existsByCompradorIdAndVendedorId(comprador, vendedor);
+        if (jaExiste) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você já segue essse vendedor.");
+        }
         seguidores.setVendedorId(vendedor);
         seguidores.setCompradorId(comprador);
         seguidoresRepository.save(seguidores).toString();

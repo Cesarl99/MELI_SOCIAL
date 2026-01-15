@@ -13,6 +13,7 @@ public interface SeguidoresRepository extends JpaRepository<SeguidoresEntity, Lo
     int countByVendedorId(UsuarioEntity vendedorId);
     List<SeguidoresEntity> findByVendedorId(UsuarioEntity vendedorId);
     List<SeguidoresEntity> findByCompradorId(UsuarioEntity compradorId);
+    boolean existsByCompradorIdAndVendedorId(UsuarioEntity compradorId, UsuarioEntity vendedorId);
     @Transactional
     void deleteByCompradorIdAndVendedorId(UsuarioEntity compradorId, UsuarioEntity vendedorId);
 }
