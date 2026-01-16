@@ -6,9 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ApiSocialApplication {
 
+
+    // TODO ALTERAR NOME DO VARIAVEIS PADRÃO INGLES
+    // TODO DESENVOLVER TESTES
     public static void main(String[] args) {
         SpringApplication.run(ApiSocialApplication.class, args);
     }
-
-
 }

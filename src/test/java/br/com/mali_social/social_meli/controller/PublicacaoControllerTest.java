@@ -1,11 +1,11 @@
 package br.com.mali_social.social_meli.controller;
 
-import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoDescontoUsuarioDto;
-import br.com.mali_social.social_meli.dto.publicacao.QuantidadePublicacaoDescontoDto;
+import br.com.mali_social.social_meli.dto.publish.PublishDiscountUserListDTO;
+import br.com.mali_social.social_meli.dto.publish.PublishDiscountQuantityDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import br.com.mali_social.social_meli.dto.publicacao.ListaPublicacaoUsuariosDto;
-import br.com.mali_social.social_meli.dto.publicacao.PublicacaoDto;
-import br.com.mali_social.social_meli.dto.produto.ProdutoDto;
+import br.com.mali_social.social_meli.dto.publish.PublishUserListDTO;
+import br.com.mali_social.social_meli.dto.publish.PublishDTO;
+import br.com.mali_social.social_meli.dto.product.ProductDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class PublicacaoControllerTeste {
+class PublishControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -35,7 +35,7 @@ class PublicacaoControllerTeste {
     @Test
     void criarPublicacaoComSucesso() throws Exception {
 
-        ProdutoDto produto = new ProdutoDto();
+        ProductDTO produto = new ProductDTO();
         produto.setProduct_id(null);
         produto.setProduct_name("Headset RGB Inalámbrico");
         produto.setType("Gamer");
@@ -46,17 +46,17 @@ class PublicacaoControllerTeste {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String data = LocalDate.of(2026, 1, 10).format(formatter);
 
-        PublicacaoDto publicacaoDto = new PublicacaoDto();
-        publicacaoDto.setUser_id(1L);
-        publicacaoDto.setPost_id(null);
-        publicacaoDto.setDate(data);
-        publicacaoDto.setProduct(produto);
-        publicacaoDto.setCategory(120);
-        publicacaoDto.setPrice(2800.69);
-        publicacaoDto.setHas_promo(false);
-        publicacaoDto.setDiscount(0.0);
+        PublishDTO publishDTO = new PublishDTO();
+        publishDTO.setUser_id(1L);
+        publishDTO.setPost_id(null);
+        publishDTO.setDate(data);
+        publishDTO.setProduct(produto);
+        publishDTO.setCategory(120);
+        publishDTO.setPrice(2800.69);
+        publishDTO.setHas_promo(false);
+        publishDTO.setDiscount(0.0);
 
-        String jsonBody = objectMapper.writeValueAsString(publicacaoDto);
+        String jsonBody = objectMapper.writeValueAsString(publishDTO);
 
         mockMvc.perform(post("/products/publish")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,8 +77,8 @@ class PublicacaoControllerTeste {
 
         String responseJson = mvcResult.getResponse().getContentAsString();
 
-        ListaPublicacaoUsuariosDto resposta =
-                objectMapper.readValue(responseJson, ListaPublicacaoUsuariosDto.class);
+        PublishUserListDTO resposta =
+                objectMapper.readValue(responseJson, PublishUserListDTO.class);
 
         assertThat(resposta).isNotNull();
         assertThat(resposta.getUser_id()).isEqualTo(userId);
@@ -88,8 +88,8 @@ class PublicacaoControllerTeste {
 
         if (!resposta.getPublicacoes().isEmpty()) {
 
-            PublicacaoDto primeira = resposta.getPublicacoes().get(0);
-            PublicacaoDto ultima = resposta.getPublicacoes()
+            PublishDTO primeira = resposta.getPublicacoes().get(0);
+            PublishDTO ultima = resposta.getPublicacoes()
                     .get(resposta.getPublicacoes().size() - 1);
 
             LocalDate d1 = LocalDate.parse(primeira.getDate(), DateTimeFormatter.ofPattern("dd-MM-yyyy"));
@@ -102,7 +102,7 @@ class PublicacaoControllerTeste {
     @Test
     void criarPublicacaoComDesconto() throws Exception {
 
-        ProdutoDto produto = new ProdutoDto();
+        ProductDTO produto = new ProductDTO();
         produto.setProduct_name("Cadeira Gamer");
         produto.setType("Gamer");
         produto.setBrand("Racer");
@@ -112,7 +112,7 @@ class PublicacaoControllerTeste {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String data = LocalDate.of(2026, 1, 10).format(formatter);
 
-        PublicacaoDto publicacao = new PublicacaoDto();
+        PublishDTO publicacao = new PublishDTO();
         publicacao.setUser_id(1L);
         publicacao.setDate(data);
         publicacao.setProduct(produto);
@@ -144,7 +144,7 @@ class PublicacaoControllerTeste {
 
         String json = mvcResult.getResponse().getContentAsString();
 
-        QuantidadePublicacaoDescontoDto resposta = objectMapper.readValue(json, QuantidadePublicacaoDescontoDto.class);
+        PublishDiscountQuantityDTO resposta = objectMapper.readValue(json, PublishDiscountQuantityDTO.class);
 
         assertThat(resposta).isNotNull();
         assertThat(resposta.getUser_id()).isEqualTo(userId);
@@ -165,8 +165,8 @@ class PublicacaoControllerTeste {
 
         String json = mvcResult.getResponse().getContentAsString();
 
-        ListaPublicacaoDescontoUsuarioDto resposta =
-                objectMapper.readValue(json, ListaPublicacaoDescontoUsuarioDto.class);
+        PublishDiscountUserListDTO resposta =
+                objectMapper.readValue(json, PublishDiscountUserListDTO.class);
 
         assertThat(resposta).isNotNull();
          assertThat(resposta.getUser_id()).isEqualTo(userId);
@@ -174,7 +174,7 @@ class PublicacaoControllerTeste {
 
 
          if (!resposta.getPosts().isEmpty()) {
-             PublicacaoDto primeira = resposta.getPosts().get(0);
+             PublishDTO primeira = resposta.getPosts().get(0);
              assertThat(primeira.isHas_promo()).isTrue();
          }
     }
