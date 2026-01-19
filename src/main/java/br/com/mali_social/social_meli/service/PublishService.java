@@ -123,12 +123,12 @@ public class PublishService {
         ProductDTO productDto = null;
         if (prod != null) {
             productDto = new ProductDTO(
+                    prod.getProduct_name(),
                     prod.getNotes(),
                     prod.getColor(),
-                    prod.getBrand(),
                     prod.getId(),
-                    prod.getType(),
-                    prod.getProduct_name()
+                    prod.getBrand(),
+                    prod.getType()
             );
         }
 
