@@ -17,7 +17,7 @@ public class ProductService {
 
         Product product = new Product();
 
-        product.setNotes(productDto.getProduct_name());
+        product.setProduct_name(productDto.getProduct_name());
         product.setType(productDto.getType());
         product.setBrand(productDto.getBrand());
         product.setColor(productDto.getColor());
