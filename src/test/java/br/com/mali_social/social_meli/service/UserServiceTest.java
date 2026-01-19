@@ -40,24 +40,24 @@ class UserServiceTest {
     private Verification verification;
 
     @Test
-    void TestSalvaUsuarioSucesso() {
+    void testSalvaUsuarioSucesso() {
         // ARRANGE
         UserDTO usuariodtoTest = new UserDTO();
         usuariodtoTest.setUser_name("Luis");
 
         // ACT
-        userService.salvarUsuario(usuariodtoTest);
+        userService.saveUser(usuariodtoTest);
 
         // ASSERT
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository, times(1)).save(captor.capture());
 
         User entidadeQueFoiSalva = captor.getValue();
-        assertEquals("Luis", entidadeQueFoiSalva.getNome());
+        assertEquals("Luis", entidadeQueFoiSalva.getUserName());
     }
 
     @Test
-    void TestSeguirComSucesso() {
+    void testSeguirComSucesso() {
         // ARRANGE
         long compradorId = 10;
         long vendedorId = 20;
@@ -69,27 +69,27 @@ class UserServiceTest {
         vendedor.setId(vendedorId);
 
         Follower salvo = new Follower();
-        salvo.setCompradorId(comprador);
-        salvo.setVendedorId(vendedor);
+        salvo.setBuyerId(comprador);
+        salvo.setSellerId(vendedor);
 
         when(userRepository.findById(vendedorId)).thenReturn(Optional.of(vendedor));
         when(userRepository.findById(compradorId)).thenReturn(Optional.of(comprador));
         when(followerRepository.save(any(Follower.class))).thenReturn(salvo);
 
         // ACT
-        userService.seguir(compradorId, vendedorId);
+        userService.follow(compradorId, vendedorId);
 
         // ASSERT
         ArgumentCaptor<Follower> segCaptor = ArgumentCaptor.forClass(Follower.class);
         verify(followerRepository).save(segCaptor.capture());
         Follower enviadoParaSalvar = segCaptor.getValue();
 
-        assertEquals(comprador, enviadoParaSalvar.getCompradorId());
-        assertEquals(vendedor, enviadoParaSalvar.getVendedorId());
+        assertEquals(comprador, enviadoParaSalvar.getBuyerId());
+        assertEquals(vendedor, enviadoParaSalvar.getSellerId());
     }
 
     @Test
-    void TestSeguirExececaoCompradorNaoCadastrado(){
+    void testSeguirExececaoCompradorNaoCadastrado(){
         // ARRANGE
         long compradorId = 10;
         long vendedorId = 20;
@@ -106,7 +106,7 @@ class UserServiceTest {
         // ACT
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.seguir(compradorId, vendedorId)
+                () -> userService.follow(compradorId, vendedorId)
         );
         // ASSERT
         assertEquals("O usuario (comprador) não encontrado.", exception.getReason());
@@ -114,7 +114,7 @@ class UserServiceTest {
     }
 
     @Test
-    void TestSeguirExcecaoVendedorNaoCadastro(){
+    void testSeguirExcecaoVendedorNaoCadastro(){
         // ARRANGE
         long compradorId = 10;
         long vendedorId = 20;
@@ -129,7 +129,7 @@ class UserServiceTest {
         // ACT
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.seguir(compradorId, vendedorId)
+                () -> userService.follow(compradorId, vendedorId)
         );
 
         // ASSERT
@@ -138,7 +138,7 @@ class UserServiceTest {
     }
 
     @Test
-    void TestSeguirExcecaoIdUsuarioInvalido(){
+    void testSeguirExcecaoIdUsuarioInvalido(){
         // ARRANGE
         long compradorId = 0;
         long vendedorId = 0;
@@ -152,7 +152,7 @@ class UserServiceTest {
         // ACT
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.seguir(compradorId, vendedorId)
+                () -> userService.follow(compradorId, vendedorId)
         );
 
         // ASSERT
@@ -162,7 +162,7 @@ class UserServiceTest {
     }
 
     @Test
-    void TestContarSeguidoresCorreto(){
+    void testContarSeguidoresCorreto(){
         // arrange
         long vendedorId = 14;
 
@@ -170,10 +170,10 @@ class UserServiceTest {
 
         vendedor.setId(vendedorId);
         when(userRepository.findById(vendedorId)).thenReturn(Optional.of(vendedor));
-        when(followerRepository.countByVendedorId(vendedor)).thenReturn(25);
+        when(followerRepository.countBySellerId(vendedor)).thenReturn(25);
 
         // act
-        FollowersQuantityDTO seguidores = userService.contaSeguidores(vendedorId);
+        FollowersQuantityDTO seguidores = userService.countFollowers(vendedorId);
 
         assertNotNull(seguidores);
 
@@ -181,7 +181,7 @@ class UserServiceTest {
     }
 
     @Test
-    void TestContarSeguidoresExcecaoUsuarioNaoCadastrado(){
+    void testContarSeguidoresExcecaoUsuarioNaoCadastrado(){
 
         // arrange
         long vendedorId = 14;
@@ -195,7 +195,7 @@ class UserServiceTest {
         // act
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.contaSeguidores(vendedorId)
+                () -> userService.countFollowers(vendedorId)
         );
 
 
@@ -218,7 +218,7 @@ class UserServiceTest {
         // act
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.contaSeguidores(vendedorId)
+                () -> userService.countFollowers(vendedorId)
         );
 
 
@@ -237,36 +237,36 @@ class UserServiceTest {
 
         User segA = new User();
         segA.setId(1l);
-        segA.setNome("Ana");
+        segA.setUserName("Ana");
 
         User segB = new User();
         segB.setId(2l);
-        segB.setNome("Carlos");
+        segB.setUserName("Carlos");
 
         User segC = new User();
         segC.setId(3l);
-        segC.setNome("Bruno");
+        segC.setUserName("Bruno");
 
         Follower relA = new Follower();
-        relA.setCompradorId(segA);
+        relA.setBuyerId(segA);
 
         Follower relB = new Follower();
-        relB.setCompradorId(segB);
+        relB.setBuyerId(segB);
 
         Follower relC = new Follower();
-        relC.setCompradorId(segC);
+        relC.setBuyerId(segC);
 
         List<Follower> relacoes = List.of(relA, relB, relC);
 
         when(userRepository.findById(vendedorId)).thenReturn(Optional.of(vendedor));
-        when(followerRepository.findByVendedorId(vendedor)).thenReturn(relacoes);
-        when(userRepository.findById(relacoes.get(0).getCompradorId().getId())).thenReturn(Optional.of(relacoes.get(0).getCompradorId()));
-        when(userRepository.findById(relacoes.get(1).getCompradorId().getId())).thenReturn(Optional.of(relacoes.get(1).getCompradorId()));
-        when(userRepository.findById(relacoes.get(2).getCompradorId().getId())).thenReturn(Optional.of(relacoes.get(2).getCompradorId()));
+        when(followerRepository.findBySellerId(vendedor)).thenReturn(relacoes);
+        when(userRepository.findById(relacoes.get(0).getBuyerId().getId())).thenReturn(Optional.of(relacoes.get(0).getBuyerId()));
+        when(userRepository.findById(relacoes.get(1).getBuyerId().getId())).thenReturn(Optional.of(relacoes.get(1).getBuyerId()));
+        when(userRepository.findById(relacoes.get(2).getBuyerId().getId())).thenReturn(Optional.of(relacoes.get(2).getBuyerId()));
 
 
         // ACT
-        UserFollowersListDTO dto = userService.listaSeguidores(vendedorId, "name_asc");
+        UserFollowersListDTO dto = userService.listFollowers(vendedorId, "name_asc");
 
         // ASSERT
         assertNotNull(dto);
@@ -290,36 +290,36 @@ class UserServiceTest {
 
         User segA = new User();
         segA.setId(1l);
-        segA.setNome("Ana");
+        segA.setUserName("Ana");
 
         User segB = new User();
         segB.setId(2l);
-        segB.setNome("Carlos");
+        segB.setUserName("Carlos");
 
         User segC = new User();
         segC.setId(3l);
-        segC.setNome("Bruno");
+        segC.setUserName("Bruno");
 
         Follower relA = new Follower();
-        relA.setCompradorId(segA);
+        relA.setBuyerId(segA);
 
         Follower relB = new Follower();
-        relB.setCompradorId(segB);
+        relB.setBuyerId(segB);
 
         Follower relC = new Follower();
-        relC.setCompradorId(segC);
+        relC.setBuyerId(segC);
 
         List<Follower> relacoes = List.of(relA, relB, relC);
 
         when(userRepository.findById(vendedorId)).thenReturn(Optional.of(vendedor));
-        when(followerRepository.findByVendedorId(vendedor)).thenReturn(relacoes);
-        when(userRepository.findById(relacoes.get(0).getCompradorId().getId())).thenReturn(Optional.of(relacoes.get(0).getCompradorId()));
-        when(userRepository.findById(relacoes.get(1).getCompradorId().getId())).thenReturn(Optional.of(relacoes.get(1).getCompradorId()));
-        when(userRepository.findById(relacoes.get(2).getCompradorId().getId())).thenReturn(Optional.of(relacoes.get(2).getCompradorId()));
+        when(followerRepository.findBySellerId(vendedor)).thenReturn(relacoes);
+        when(userRepository.findById(relacoes.get(0).getBuyerId().getId())).thenReturn(Optional.of(relacoes.get(0).getBuyerId()));
+        when(userRepository.findById(relacoes.get(1).getBuyerId().getId())).thenReturn(Optional.of(relacoes.get(1).getBuyerId()));
+        when(userRepository.findById(relacoes.get(2).getBuyerId().getId())).thenReturn(Optional.of(relacoes.get(2).getBuyerId()));
 
 
         // ACT
-        UserFollowersListDTO dto = userService.listaSeguidores(vendedorId, "name_desc");
+        UserFollowersListDTO dto = userService.listFollowers(vendedorId, "name_desc");
 
         // ASSERT
         assertNotNull(dto);
@@ -347,7 +347,7 @@ class UserServiceTest {
         // act
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.listaSeguidores(vendedorId, "name_desc")
+                () -> userService.listFollowed(vendedorId, "name_desc")
         );
 
         // ASSERT
@@ -368,7 +368,7 @@ class UserServiceTest {
         // act
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.listaSeguidores(vendedorId, "name_desc")
+                () -> userService.listFollowed(vendedorId, "name_desc")
         );
 
 
@@ -387,36 +387,36 @@ class UserServiceTest {
 
         User segA = new User();
         segA.setId(1l);
-        segA.setNome("Augusto");
+        segA.setUserName("Augusto");
 
         User segB = new User();
         segB.setId(2l);
-        segB.setNome("Daniel");
+        segB.setUserName("Daniel");
 
         User segC = new User();
         segC.setId(3l);
-        segC.setNome("Carlos");
+        segC.setUserName("Carlos");
 
         Follower relA = new Follower();
-        relA.setVendedorId(segA);
+        relA.setSellerId(segA);
 
         Follower relB = new Follower();
-        relB.setVendedorId(segB);
+        relB.setSellerId(segB);
 
         Follower relC = new Follower();
-        relC.setVendedorId(segC);
+        relC.setSellerId(segC);
 
         List<Follower> relacoes = List.of(relA, relB, relC);
 
         when(userRepository.findById(compradorId)).thenReturn(Optional.of(comprador));
-        when(followerRepository.findByCompradorId(comprador)).thenReturn(relacoes);
-        when(userRepository.findById(relacoes.get(0).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(0).getVendedorId()));
-        when(userRepository.findById(relacoes.get(1).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(1).getVendedorId()));
-        when(userRepository.findById(relacoes.get(2).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(2).getVendedorId()));
+        when(followerRepository.findByBuyerId(comprador)).thenReturn(relacoes);
+        when(userRepository.findById(relacoes.get(0).getSellerId().getId())).thenReturn(Optional.of(relacoes.get(0).getSellerId()));
+        when(userRepository.findById(relacoes.get(1).getSellerId().getId())).thenReturn(Optional.of(relacoes.get(1).getSellerId()));
+        when(userRepository.findById(relacoes.get(2).getSellerId().getId())).thenReturn(Optional.of(relacoes.get(2).getSellerId()));
 
 
         // ACT
-        UserFollowerListDTO dto = userService.listaSeguindo(compradorId, "name_asc");
+        UserFollowerListDTO dto = userService.listFollowed(compradorId, "name_asc");
 
         // ASSERT
         assertNotNull(dto);
@@ -440,35 +440,35 @@ class UserServiceTest {
 
         User segA = new User();
         segA.setId(1l);
-        segA.setNome("Augusto");
+        segA.setUserName("Augusto");
 
         User segB = new User();
         segB.setId(2l);
-        segB.setNome("Daniel");
+        segB.setUserName("Daniel");
 
         User segC = new User();
         segC.setId(3l);
-        segC.setNome("Carlos");
+        segC.setUserName("Carlos");
 
         Follower relA = new Follower();
-        relA.setVendedorId(segA);
+        relA.setSellerId(segA);
 
         Follower relB = new Follower();
-        relB.setVendedorId(segB);
+        relB.setSellerId(segB);
 
         Follower relC = new Follower();
-        relC.setVendedorId(segC);
+        relC.setSellerId(segC);
 
         List<Follower> relacoes = List.of(relA, relB, relC);
 
         when(userRepository.findById(compradorId)).thenReturn(Optional.of(comprador));
-        when(followerRepository.findByCompradorId(comprador)).thenReturn(relacoes);
-        when(userRepository.findById(relacoes.get(0).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(0).getVendedorId()));
-        when(userRepository.findById(relacoes.get(1).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(1).getVendedorId()));
-        when(userRepository.findById(relacoes.get(2).getVendedorId().getId())).thenReturn(Optional.of(relacoes.get(2).getVendedorId()));
+        when(followerRepository.findByBuyerId(comprador)).thenReturn(relacoes);
+        when(userRepository.findById(relacoes.get(0).getSellerId().getId())).thenReturn(Optional.of(relacoes.get(0).getSellerId()));
+        when(userRepository.findById(relacoes.get(1).getSellerId().getId())).thenReturn(Optional.of(relacoes.get(1).getSellerId()));
+        when(userRepository.findById(relacoes.get(2).getSellerId().getId())).thenReturn(Optional.of(relacoes.get(2).getSellerId()));
 
         // ACT
-        UserFollowerListDTO dto = userService.listaSeguindo(compradorId, "name_desc");
+        UserFollowerListDTO dto = userService.listFollowed(compradorId, "name_desc");
 
         // ASSERT
         assertNotNull(dto);
@@ -496,7 +496,7 @@ class UserServiceTest {
         // act
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.listaSeguindo(compradorId, "name_desc")
+                () -> userService.listFollowers(compradorId, "name_desc")
         );
 
         // ASSERT
@@ -517,7 +517,7 @@ class UserServiceTest {
         // act
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.listaSeguindo(vendedorId, "name_desc")
+                () -> userService.listFollowers(vendedorId, "name_desc")
         );
 
         // ASSERT
@@ -541,7 +541,7 @@ class UserServiceTest {
         when(userRepository.findById(compradorId)).thenReturn(Optional.of(comprador));
 
         // ACT
-        userService.deixarDeSeguir(compradorId, vendedorId);
+        userService.unfollow(compradorId, vendedorId);
 
         // ASSERT
 
@@ -549,7 +549,7 @@ class UserServiceTest {
         ArgumentCaptor<User> vendedorCaptor = ArgumentCaptor.forClass(User.class);
 
 
-        verify(followerRepository).deleteByCompradorIdAndVendedorId(
+        verify(followerRepository).deleteByBuyerIdAndSellerId(
                 compradorCaptor.capture(),
                 vendedorCaptor.capture()
         );
@@ -560,7 +560,7 @@ class UserServiceTest {
         assertEquals(comprador.getId(), compradorEnviado.getId());
         assertEquals(vendedor.getId(), vendedorEnviado.getId());
 
-        verify(followerRepository).deleteByCompradorIdAndVendedorId(comprador, vendedor);
+        verify(followerRepository).deleteByBuyerIdAndSellerId(comprador, vendedor);
 
     }
 
@@ -583,7 +583,7 @@ class UserServiceTest {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.deixarDeSeguir(compradorId, vendedorId)
+                () -> userService.unfollow(compradorId, vendedorId)
         );
 
         // ASSERT
@@ -606,7 +606,7 @@ class UserServiceTest {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.deixarDeSeguir(compradorId, vendedorId)
+                () -> userService.unfollow(compradorId, vendedorId)
         );
 
         // ASSERT
@@ -630,7 +630,7 @@ class UserServiceTest {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> userService.deixarDeSeguir(compradorId, vendedorId)
+                () -> userService.unfollow(compradorId, vendedorId)
         );
 
         // ASSERT

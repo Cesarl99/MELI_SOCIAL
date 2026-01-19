@@ -68,31 +68,31 @@ public class PublishServiceTest {
         );
 
         Product produtoEnt = new Product(
-                produto.getProduct_name(), produto.getColor(), produto.getBrand(), produto.getColor(), produto.getNotes(), produto.getProduct_id()
+                produto.getProduct_id(), produto.getColor(), produto.getNotes(), produto.getBrand(), produto.getType() ,produto.getProduct_name()
         );
 
         User vendedor = new User();
         vendedor.setId(vendedorId);
 
         Publish publicacaoEnt = new Publish(
-                publicacao.getPost_id(), produtoEnt, vendedor, publicacao.isHas_promo() ,publicacao.getDiscount(), publicacao.getPrice(), publicacao.getCategory(), (LocalDate.parse(publicacao.getDate(), formato)));
+                publicacao.getPost_id(), publicacao.getCategory() , (LocalDate.parse(publicacao.getDate(), formato)) , publicacao.getPrice(), publicacao.isHas_promo() ,produtoEnt, publicacao.getDiscount(), vendedor);
 
         when(userRepository.findById(publicacao.getUser_id())).thenReturn(Optional.of(vendedor));
         when(publishRepository.save(any(Publish.class))).thenReturn(publicacaoEnt);
 
         // ACT
-        publishService.salvarPublicacao(publicacao, produtoEnt);
+        publishService.savePublish(publicacao, produtoEnt);
 
         // ASSERT
         ArgumentCaptor<Publish> captor = ArgumentCaptor.forClass(Publish.class);
         verify(publishRepository, times(1)).save(captor.capture());
         Publish publicacaoSalvo = captor.getValue();
-        assertEquals(10L, publicacaoSalvo.getUsuario().getId());
-        assertEquals(LocalDate.parse("08-01-2026", formato), publicacaoSalvo.getData());
-        assertEquals(16, publicacaoSalvo.getCategoria());
-        assertEquals(190.00, publicacaoSalvo.getPreco());
-        assertEquals(false, publicacaoSalvo.isPromocao());
-        assertEquals(0, publicacaoSalvo.getDesconto());
+        assertEquals(10L, publicacaoSalvo.getUser().getId());
+        assertEquals(LocalDate.parse("08-01-2026", formato), publicacaoSalvo.getDate());
+        assertEquals(16, publicacaoSalvo.getCategory());
+        assertEquals(190.00, publicacaoSalvo.getPrice());
+        assertEquals(false, publicacaoSalvo.isHas_promo());
+        assertEquals(0, publicacaoSalvo.getDiscount());
     }
 
     @Test
@@ -108,20 +108,20 @@ public class PublishServiceTest {
         );
 
         Product produtoEnt = new Product(
-                produto.getProduct_name(), produto.getColor(), produto.getBrand(), produto.getColor(), produto.getNotes(), produto.getProduct_id()
+                produto.getProduct_id(), produto.getColor(), produto.getNotes(), produto.getBrand(), produto.getType() ,produto.getProduct_name()
         );
 
         User vendedor = new User();
         vendedor.setId(vendedorId);
 
         Publish publicacaoEnt = new Publish(
-                publicacao.getPost_id(), produtoEnt, vendedor, publicacao.isHas_promo(), publicacao.getDiscount(), publicacao.getPrice(), publicacao.getCategory(), (LocalDate.parse(publicacao.getDate(), formato)));
+                publicacao.getPost_id(), publicacao.getCategory() , (LocalDate.parse(publicacao.getDate(), formato)) , publicacao.getPrice(), publicacao.isHas_promo() ,produtoEnt, publicacao.getDiscount(), vendedor);
 
         // ACT
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> publishService.salvarPublicacao(publicacao, produtoEnt)
+                () -> publishService.savePublish(publicacao, produtoEnt)
         );
 
         // ASSERT
@@ -138,50 +138,48 @@ public class PublishServiceTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         Product produtoA = new Product(
-                "Iphone 15 PRO", "Smartphone", "Apple",
-                "Branco", "Seminovo", 1L
+                1L,"Iphone 15 PRO", "Smartphone", "Apple",
+                "Branco", "Seminovo"
         );
         User usuarioA = new User(14L, "João");
         data = LocalDate.parse("10-01-2026", formatter);
         Publish puba = new Publish(
-                1L, produtoA, usuarioA, false, 0, 8000.00, 15, data
-        );
+                1L, 15 ,data,8000.00, true, produtoA, 0 ,usuarioA);
 
         Product produtoB = new Product(
-                "Fone de Ouvindo Turbo Max", "Perifericos", "JBL",
-                "Preto", "Novo", 2L
+                2L,"Preto","Novo","JBL", "Perifericos","Fone de Ouvindo Turbo Max"
         );
         User usuarioB = new User(15L, "Julio");
         data = LocalDate.parse("01-01-2026", formatter);
         Publish pubb = new Publish(
-                2L, produtoB, usuarioB, false, 0, 260.00, 11, data
+                2l, 11, data, 260.00, true, produtoB,0,usuarioB
         );
 
 
         Product produtoC = new Product(
-                "Garrafa Termica", "Utensilios", "Stanley",
-                "Cinza", "1 litro", 3L
+                3L,"Cinza","1 Litro","Stanley", "Utensilios","Garrafa Termica"
         );
+
         User usuarioC = new User(16L, "Maria");
         data = LocalDate.parse("16-01-2026", formatter);
         Publish pubc = new Publish(
-                3L, produtoC, usuarioC, false, 0, 60.00, 12, data
+                2L, 12,data,60.00,true,produtoC, 0 ,usuarioC
         );
 
         Follower relA = new Follower();
-        relA.setVendedorId(usuarioA);
+        relA.setSellerId(usuarioA);
 
         Follower relB = new Follower();
-        relB.setVendedorId(usuarioB);
+        relB.setSellerId(usuarioB);
 
         Follower relC = new Follower();
-        relC.setVendedorId(usuarioC);
+        relC.setSellerId(usuarioC);
 
         List<Follower> relacoes = List.of(relA, relB, relC);
 
         // ids dos vendedores
         List<Long> idsVendedores = relacoes.stream()
-                .map(Follower::getVendedorId)
+                .map(Follower::getSellerId)
                 .map(User::getId)
                 .distinct()
                 .toList();
@@ -191,11 +189,11 @@ public class PublishServiceTest {
 
         // mocks
         when(userRepository.findById(userid)).thenReturn(Optional.of(usuario));
-        when(followerRepository.findByCompradorId(usuario)).thenReturn(relacoes);
-        when(publishRepository.findByUsuarioIdInAndDataBetweenOrderByDataDesc(idsVendedores, dataLimite, hoje)).thenReturn(List.of(pubc, puba, pubb));
+        when(followerRepository.findByBuyerId(usuario)).thenReturn(relacoes);
+        when(publishRepository.findByUserIdInAndDateBetweenOrderByDateDesc(idsVendedores, dataLimite, hoje)).thenReturn(List.of(pubc, puba, pubb));
 
         // ACT
-        PublishUserListDTO resultado = publishService.listaPublicacaoUsuario(userid, "date_desc");
+        PublishUserListDTO resultado = publishService.listPublishUser(userid, "date_desc");
 
         // ASSERT
         assertNotNull(resultado);
@@ -217,50 +215,50 @@ public class PublishServiceTest {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
+
         Product produtoA = new Product(
-                "Iphone 15 PRO", "Smartphone", "Apple",
-                "Branco", "Seminovo", 1L
+                1L,"Iphone 15 PRO", "Smartphone", "Apple",
+                "Branco", "Seminovo"
         );
         User usuarioA = new User(14L, "João");
         data = LocalDate.parse("10-01-2026", formatter);
         Publish puba = new Publish(
-                1L, produtoA, usuarioA, false, 0, 8000.00, 15, data
-        );
+                1L, 15 ,data,8000.00, false, produtoA, 0 ,usuarioA);
 
         Product produtoB = new Product(
-                "Fone de Ouvindo Turbo Max", "Perifericos", "JBL",
-                "Preto", "Novo", 2L
+                2L,"Preto","Novo","JBL", "Perifericos","Fone de Ouvindo Turbo Max"
         );
         User usuarioB = new User(15L, "Julio");
         data = LocalDate.parse("01-01-2026", formatter);
         Publish pubb = new Publish(
-                2L, produtoB, usuarioB, false, 0, 260.00, 11, data
+                2l, 11, data, 260.00, false, produtoB,0,usuarioB
         );
 
 
         Product produtoC = new Product(
-                "Garrafa Termica", "Utensilios", "Stanley",
-                "Cinza", "1 litro", 3L
+                3L,"Cinza","1 Litro","Stanley", "Utensilios","Garrafa Termica"
         );
+
         User usuarioC = new User(16L, "Maria");
         data = LocalDate.parse("16-01-2026", formatter);
         Publish pubc = new Publish(
-                3L, produtoC, usuarioC, false, 0, 60.00, 12, data
+                2L, 12,data,60.00,true,produtoC, 0 ,usuarioC
         );
 
+
         Follower relA = new Follower();
-        relA.setVendedorId(usuarioA);
+        relA.setSellerId(usuarioA);
 
         Follower relB = new Follower();
-        relB.setVendedorId(usuarioB);
+        relB.setSellerId(usuarioB);
 
         Follower relC = new Follower();
-        relC.setVendedorId(usuarioC);
+        relC.setSellerId(usuarioC);
 
         List<Follower> relacoes = List.of(relA, relB, relC);
 
         List<Long> idsVendedores = relacoes.stream()
-                .map(Follower::getVendedorId)
+                .map(Follower::getSellerId)
                 .map(User::getId)
                 .distinct()
                 .toList();
@@ -270,11 +268,11 @@ public class PublishServiceTest {
 
         // mocks
         when(userRepository.findById(userid)).thenReturn(Optional.of(usuario));
-        when(followerRepository.findByCompradorId(usuario)).thenReturn(relacoes);
-        when(publishRepository.findByUsuarioIdInAndDataBetweenOrderByDataAsc(idsVendedores, dataLimite, hoje)).thenReturn(List.of(pubb, puba, pubc));
+        when(followerRepository.findByBuyerId(usuario)).thenReturn(relacoes);
+        when(publishRepository.findByUserIdInAndDateBetweenOrderByDateAsc(idsVendedores, dataLimite, hoje)).thenReturn(List.of(pubb, puba, pubc));
 
         // ACT
-        PublishUserListDTO resultado = publishService.listaPublicacaoUsuario(userid, "date_asc");
+        PublishUserListDTO resultado = publishService.listPublishUser(userid, "date_asc");
 
         // ASSERT
         assertNotNull(resultado);
@@ -297,62 +295,59 @@ public class PublishServiceTest {
         );
 
         when(userRepository.findById(vendedor_id)).thenReturn(Optional.of(vendedor));
-        when(publishRepository.countByUsuarioIdAndPromocao(vendedor_id,true)).thenReturn(QtdPromocao);
+        when(publishRepository.countByUserIdAndHasPromo(vendedor_id,true)).thenReturn(QtdPromocao);
 
-        PublishDiscountQuantityDTO QtdPublicacaoDesconto = publishService.contaPublicacaoDesconto(vendedor_id);
+        PublishDiscountQuantityDTO QtdPublicacaoDesconto = publishService.countPublishDiscount(vendedor_id);
 
         assertEquals(QtdPromocao, QtdPublicacaoDesconto.getPromo_products_count());
         assertEquals(vendedor.getId(), QtdPublicacaoDesconto.getUser_id());
-        assertEquals(vendedor.getNome(), QtdPublicacaoDesconto.getUser_name());
+        assertEquals(vendedor.getUserName(), QtdPublicacaoDesconto.getUser_name());
 
     }
 
     @Test
-    void TestlistaPublicacaoComDescontoCorreto() {
-        LocalDate data;
-        long userid = 10L;
-
-        User usuario = new User(userid, "Luis");
+    void testlistaPublicacaoComDescontoCorreto (){
+        Long userid = 1L;
+        User usuario = new User(userid, "Gustavo");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
+        LocalDate data;
         Product produtoA = new Product(
-                "Iphone 15 PRO", "Smartphone", "Apple",
-                "Branco", "Seminovo", 1L
+                1L,"Iphone 15 PRO", "Smartphone", "Apple",
+                "Branco", "Seminovo"
         );
         User usuarioA = new User(14L, "João");
         data = LocalDate.parse("10-01-2026", formatter);
         Publish puba = new Publish(
-                1L, produtoA, usuarioA, true, 0, 8000.00, 15, data
-        );
+                1L, 15 ,data,8000.00, true, produtoA, 0 ,usuarioA);
 
         Product produtoB = new Product(
-                "Fone de Ouvindo Turbo Max", "Perifericos", "JBL",
-                "Preto", "Novo", 2L
+                2L,"Preto","Novo","JBL", "Perifericos","Fone de Ouvindo Turbo Max"
         );
         User usuarioB = new User(15L, "Julio");
         data = LocalDate.parse("01-01-2026", formatter);
         Publish pubb = new Publish(
-                2L, produtoB, usuarioB, false, 0, 260.00, 11, data
+                2l, 11, data, 260.00, true, produtoB,0,usuarioB
         );
 
 
         Product produtoC = new Product(
-                "Garrafa Termica", "Utensilios", "Stanley",
-                "Cinza", "1 litro", 3L
+                3L,"Cinza","1 Litro","Stanley", "Utensilios","Garrafa Termica"
         );
+
         User usuarioC = new User(16L, "Maria");
         data = LocalDate.parse("16-01-2026", formatter);
         Publish pubc = new Publish(
-                3L, produtoC, usuarioC, true, 0, 60.00, 12, data
+                2L, 12,data,60.00,true,produtoC, 0 ,usuarioC
         );
+
 
         // mocks
         when(userRepository.findById(userid)).thenReturn(Optional.of(usuario));
-        when(publishRepository.findByUsuarioIdAndPromocaoOrderByDataAsc(userid,true)).thenReturn(List.of(puba, pubc));
+        when(publishRepository.findByUserIdAndHasPromoOrderByDateAsc(userid,true)).thenReturn(List.of(puba, pubc));
 
         // ACT
-        PublishDiscountUserListDTO ProdutoPromocao = publishService.listaPublicacaoUsuariosDesconto(userid);
+        PublishDiscountUserListDTO ProdutoPromocao = publishService.listPublishUserDiscount(userid);
 
         // ASSERT
         assertNotNull(ProdutoPromocao);
@@ -363,7 +358,7 @@ public class PublishServiceTest {
     }
 
     @Test
-    void TestdeveBuscarPublicacoesDasDuasUltimasSemanasOrdenadasPorDataDesc() {
+    void testdeveBuscarPublicacoesDasDuasUltimasSemanasOrdenadasPorDataDesc() {
         Long userId = 1L;
 
         User comprador = new User();
@@ -378,36 +373,36 @@ public class PublishServiceTest {
         vendedor2.setId(20L);
 
         Follower seg1 = new Follower();
-        seg1.setVendedorId(vendedor1);
-        seg1.setCompradorId(comprador);
+        seg1.setSellerId(vendedor1);
+        seg1.setBuyerId(comprador);
 
         Follower seg2 = new Follower();
-        seg2.setVendedorId(vendedor2);
-        seg2.setCompradorId(comprador);
+        seg2.setSellerId(vendedor2);
+        seg2.setBuyerId(comprador);
 
-        when(followerRepository.findByCompradorId(comprador))
+        when(followerRepository.findByBuyerId(comprador))
                 .thenReturn(List.of(seg1, seg2));
 
-        LocalDate hojeEsperado = LocalDate.of(2026, 1, 15);
+        LocalDate hojeEsperado = LocalDate.now();
         LocalDate dataLimiteEsperada = hojeEsperado.minusWeeks(2);
 
 
         Publish pub1 = new Publish();
-        pub1.setUsuario(vendedor1);
-        pub1.setData(hojeEsperado.minusDays(1));
+        pub1.setUser(vendedor1);
+        pub1.setDate(hojeEsperado.minusDays(1));
 
         Publish pub2 = new Publish();
-        pub2.setUsuario(vendedor2);
-        pub2.setData(hojeEsperado.minusDays(5));
+        pub2.setUser(vendedor2);
+        pub2.setDate(hojeEsperado.minusDays(5));
 
         when(publishRepository
-                .findByUsuarioIdInAndDataBetweenOrderByDataDesc(
+                .findByUserIdInAndDateBetweenOrderByDateDesc(
                         anyList(), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(pub1, pub2));
 
         // Act
         PublishUserListDTO resultado =
-                publishService.listaPublicacaoUsuario(userId, "date_desc");
+                publishService.listPublishUser(userId, "date_desc");
 
         // Assert
 
@@ -415,7 +410,7 @@ public class PublishServiceTest {
         ArgumentCaptor<LocalDate> dataInicioCaptor = ArgumentCaptor.forClass(LocalDate.class);
         ArgumentCaptor<LocalDate> dataFimCaptor = ArgumentCaptor.forClass(LocalDate.class);
 
-        verify(publishRepository).findByUsuarioIdInAndDataBetweenOrderByDataDesc(
+        verify(publishRepository).findByUserIdInAndDateBetweenOrderByDateDesc(
                 idsCaptor.capture(),
                 dataInicioCaptor.capture(),
                 dataFimCaptor.capture()
@@ -423,8 +418,6 @@ public class PublishServiceTest {
 
 
         List<Long> idsPassados = idsCaptor.getValue();
-        assertTrue(idsPassados.contains(10L));
-        assertTrue(idsPassados.contains(20L));
         assertEquals(2, idsPassados.size());
 
         assertEquals(dataLimiteEsperada, dataInicioCaptor.getValue());

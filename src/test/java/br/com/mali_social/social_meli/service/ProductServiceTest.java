@@ -28,7 +28,7 @@ public class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Test
-    void TestSalvarProdutoCorreto(){
+    void testSalvarProdutoCorreto(){
         // ARRANGE
         ProductDTO produto = new ProductDTO(
                 "Cadeira Gamer", "Edição especial", "Verde", 14l, "Brasil", "Cadeira");
@@ -38,18 +38,18 @@ public class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenReturn(produtoEnt);
 
         // ACT
-        productService.salvarProduto(produto);
+        productService.saveProduct(produto);
 
         // ASSERT
         ArgumentCaptor<Product> captor = ArgumentCaptor.forClass(Product.class);
         verify(productRepository, times(1)).save(captor.capture());
 
         Product ProdutoSalvo = captor.getValue();
-        assertEquals("Edição especial", ProdutoSalvo.getNotas());
-        assertEquals("Verde", ProdutoSalvo.getCor());
-        assertEquals("Brasil", ProdutoSalvo.getMarca());
-        assertEquals("Cadeira", ProdutoSalvo.getTipo());
-        assertEquals("Cadeira Gamer", ProdutoSalvo.getNome_produto());
+        assertEquals("Edição especial", ProdutoSalvo.getNotes());
+        assertEquals("Verde", ProdutoSalvo.getColor());
+        assertEquals("Brasil", ProdutoSalvo.getBrand());
+        assertEquals("Cadeira", ProdutoSalvo.getType());
+        assertEquals("Cadeira Gamer", ProdutoSalvo.getProduct_name());
 
     }
 

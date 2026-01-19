@@ -40,14 +40,14 @@ class UserControllerTest {
         UserDTO dto = new UserDTO();
         dto.setUser_name("Luis");
 
-        doNothing().when(userService).salvarUsuario(any(UserDTO.class));
+        doNothing().when(userService).saveUser(any(UserDTO.class));
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
 
-        Mockito.verify(userService).salvarUsuario(any(UserDTO.class));
+        Mockito.verify(userService).saveUser(any(UserDTO.class));
     }
 
     @Test
@@ -57,7 +57,7 @@ class UserControllerTest {
         dto.setUser_id(userId);
         dto.setUser_name("João Teste");
 
-        when(userService.pesquisaUsuarios(userId)).thenReturn(dto);
+        when(userService.searchUser(userId)).thenReturn(dto);
 
         mockMvc.perform(get("/users/{userId}", userId)
                         .accept(MediaType.APPLICATION_JSON))
@@ -71,12 +71,12 @@ class UserControllerTest {
         int userId = 1;
         int userIdToFollow = 2;
 
-        doNothing().when(userService).seguir(userId, userIdToFollow);
+        doNothing().when(userService).follow(userId, userIdToFollow);
 
         mockMvc.perform(post("/users/{userId}/follow/{userIdToFollow}", userId, userIdToFollow))
                 .andExpect(status().isOk());
 
-        Mockito.verify(userService).seguir(userId, userIdToFollow);
+        Mockito.verify(userService).follow(userId, userIdToFollow);
     }
 
     @Test
@@ -84,7 +84,7 @@ class UserControllerTest {
         long userId = 1L;
         FollowersQuantityDTO dto = new FollowersQuantityDTO(userId, "João", 3);
 
-        when(userService.contaSeguidores(userId)).thenReturn(dto);
+        when(userService.countFollowers(userId)).thenReturn(dto);
 
         mockMvc.perform(get("/users/{userId}/followers/count", userId)
                         .accept(MediaType.APPLICATION_JSON))
@@ -104,7 +104,7 @@ class UserControllerTest {
         UserFollowersListDTO dto =
                 new UserFollowersListDTO(userId, "João Teste", List.of(seg1, seg2));
 
-        when(userService.listaSeguidores(eq(userId), eq("name_asc")))
+        when(userService.listFollowers(eq(userId), eq("name_asc")))
                 .thenReturn(dto);
 
         mockMvc.perform(get("/users/{userId}/followers/list", userId)
@@ -123,7 +123,7 @@ class UserControllerTest {
         UserFollowerListDTO dto =
                 new UserFollowerListDTO(userId, "João Teste", List.of(seg1, seg2));
 
-        when(userService.listaSeguindo(eq(userId), eq("name_desc")))
+        when(userService.listFollowed(eq(userId), eq("name_desc")))
                 .thenReturn(dto);
 
         mockMvc.perform(get("/users/{userId}/followed/list", userId)
@@ -137,11 +137,11 @@ class UserControllerTest {
         int userId = 1;
         int userIdToUnfollow = 2;
 
-        doNothing().when(userService).deixarDeSeguir(userId, userIdToUnfollow);
+        doNothing().when(userService).unfollow(userId, userIdToUnfollow);
 
         mockMvc.perform(post("/users/{userId}/unfollow/{userIdToUnfollow}", userId, userIdToUnfollow))
                 .andExpect(status().isOk());
 
-        Mockito.verify(userService).deixarDeSeguir(userId, userIdToUnfollow);
+        Mockito.verify(userService).unfollow(userId, userIdToUnfollow);
     }
 }
